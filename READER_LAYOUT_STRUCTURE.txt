@@ -1,0 +1,16 @@
+READER LAYOUT STRUCTURE
+
+config/reader-config.js
+  Reader shell settings: title, book URL, font steps and TOC selectors.
+
+config/layout-rules.js
+  Book layout settings used inside the iframe:
+  - pagination geometry;
+  - image composition rules;
+  - static image profiles for 85%, 100% and 125%.
+
+app/book-bridge.js
+  Pagination and composition algorithms. It reads values from layout-rules.js.
+
+To replace the InDesign HTML, keep its paragraph/object class names and ensure
+config/layout-rules.js is loaded immediately before app/book-bridge.js.

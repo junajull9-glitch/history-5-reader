@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Нашествие Батыя на Русь</title>
+<style>
+:root{
+  --paper:#fffdf7;--ink:#1e2b25;--muted:#6c766f;--panel:#f2ead6;
+  --line:#b89d5e;--accent:#b75b2e;--accent-blue:#0aa1d8;
+  --green:#10261d;--green2:#18392b;--gold:#d1ad58;
+  --route1:#474747;--route2:#d29a18;
+  --shadow:0 18px 60px rgba(0,0,0,.22)
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#152019;color:var(--ink);font-family:"PT Serif",Georgia,"Times New Roman",serif}
+body{padding:18px}
+button{font:inherit}
+.shell{width:min(1280px,100%);margin:0 auto;background:var(--paper);border:1px solid rgba(184,157,94,.65);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.header{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 22px;background:linear-gradient(180deg,#142219,#0f1913);color:#fff5da;border-bottom:2px solid #caa85a}
+.header small{display:block;color:#d9b565;letter-spacing:.12em;text-transform:uppercase;font:600 12px/1.1 "Open Sans",Arial,sans-serif}
+h1{margin:3px 0 0;font-size:clamp(20px,2vw,30px);line-height:1.1}
+.zoom{display:flex;align-items:center;gap:8px;flex:0 0 auto;font:600 14px Arial,sans-serif}
+button,.tab{border:1px solid #d5b66f;background:rgba(255,255,255,.06);color:inherit;border-radius:9px;padding:8px 12px;cursor:pointer}
+button:hover,.tab:hover,button:focus-visible,.tab:focus-visible{outline:none;background:rgba(213,182,111,.18)}
+button.primary{background:#164b34;color:#fff;border-color:#164b34}
+button:disabled{opacity:.45;cursor:default}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 320px;min-height:680px}
+.map-pane{position:relative;overflow:hidden;min-height:680px;background:linear-gradient(rgba(255,255,255,.28),rgba(255,255,255,.28)),repeating-linear-gradient(0deg,rgba(118,101,58,.035) 0 1px,transparent 1px 5px),#d9d0bc;display:flex;align-items:center;justify-content:center;padding:22px}
+.stage{position:relative;width:min(94%,940px);transform-origin:center center;will-change:transform;user-select:none;transition:transform .18s ease}
+svg{display:block;width:100%;height:auto;max-width:100%;border:1px solid #8d794a;box-shadow:0 8px 24px rgba(58,47,22,.25)}
+.panel{display:flex;flex-direction:column;gap:18px;padding:24px;background:var(--panel);border-left:1px solid rgba(184,157,94,.55);overflow:auto}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0}
+.tab{color:var(--ink);background:rgba(255,255,255,.55);text-align:center}
+.tab.active{background:#173f2e;color:#fff;border-color:#173f2e}
+.card{background:rgba(255,255,255,.56);border:1px solid rgba(184,157,94,.55);border-radius:14px;padding:20px;margin:0}
+.eyebrow{color:var(--accent);text-transform:uppercase;letter-spacing:.12em;font:700 12px/1.2 "Open Sans",Arial,sans-serif}
+h2{margin:6px 0 10px;font-size:24px}.body{font-size:15px;line-height:1.5}.meta{color:var(--muted);font:13px Arial,sans-serif}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.speed-control{margin-top:14px;font:13px Arial,sans-serif}.speed-control label{display:flex;justify-content:space-between;gap:12px;margin-bottom:6px}.speed-control input{width:100%;accent-color:#164b34}
+.progress{height:7px;background:#ddd6c5;border-radius:99px;overflow:hidden;margin:14px 0 6px}.progress>i{display:block;height:100%;width:0;background:#c6592c;transition:width .2s}
+.battle-gallery{display:grid;grid-template-columns:1fr 1fr;gap:8px}.battle-card{border:1px solid #dfd3b4;background:#fffdf7;border-radius:10px;overflow:hidden;padding:0;cursor:pointer;text-align:left}.battle-card img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}.battle-card span{display:block;padding:8px;font:600 13px Arial,sans-serif}.battle-card:hover,.battle-card.active{border-color:#d78920;background:#fff2c9}
+.footer{padding:11px 22px;background:#f7dca0;border-top:1px solid #d8b35d;font-size:14px}
+#path1 path,#path02 path{fill:none!important;stroke-linecap:round;stroke-linejoin:round;opacity:.25;pointer-events:none}
+#path1 path{stroke:var(--route1)!important;stroke-width:92!important}#path02 path{stroke:var(--route2)!important;stroke-width:92!important}
+.route-progress{fill:none;stroke:#f25a24;stroke-width:135;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 34px #ffbd46);pointer-events:none}
+.route-marker{fill:#ffb51f;stroke:#fff;stroke-width:35;filter:drop-shadow(0 0 38px #ff9a00);pointer-events:none}
+#cities circle{fill:var(--accent-blue)!important;stroke:#fff;stroke-width:40;cursor:pointer;transform-box:fill-box;transform-origin:center;animation:pulse 1.8s ease-in-out infinite;filter:drop-shadow(0 0 42px #00aef0)}
+#cities circle:hover,#cities circle.selected{fill:#ffc036!important;filter:drop-shadow(0 0 52px #ff9d00)}
+#battles path{fill:#d54a3a!important;cursor:pointer;transform-box:fill-box;transform-origin:center;animation:battlePulse 1.4s ease-in-out infinite;filter:drop-shadow(0 0 28px rgba(214,47,36,.8))}
+#battles path:hover,#battles path.selected{fill:#ffb321!important}
+@keyframes pulse{50%{transform:scale(1.28);opacity:.72}}@keyframes battlePulse{50%{transform:scale(1.13);opacity:.68}}
+@media(max-width:900px){body{padding:0}.shell{border-radius:0;min-height:100vh}.header{align-items:flex-start;flex-direction:column}.main{grid-template-columns:1fr}.map-pane{min-height:62vh}.panel{border-left:0;border-top:1px solid rgba(184,157,94,.55)}.battle-gallery{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.zoom{flex-wrap:wrap}.panel{padding:14px}.battle-gallery{grid-template-columns:1fr}}
+
+/* ==========================================================
+   Автоподгонка модуля под размер окна
+   ========================================================== */
+html,body{width:100%;height:100%;min-height:0;overflow:hidden}
+body{padding:clamp(0px,1.2vmin,18px)}
+.shell{height:calc(100dvh - 2 * clamp(0px,1.2vmin,18px));max-height:100dvh;display:grid;grid-template-rows:auto minmax(0,1fr) auto}
+.header{padding:clamp(8px,1.4vh,18px) clamp(10px,1.5vw,22px)}
+.main{height:100%;min-height:0;grid-template-columns:minmax(0,1fr) clamp(250px,25vw,320px)}
+.map-pane{height:100%;min-height:0;padding:clamp(8px,1.5vw,22px)}
+.panel{min-height:0;overflow:auto;padding:clamp(12px,1.8vw,24px);gap:clamp(10px,1.5vh,18px)}
+.card{padding:clamp(12px,1.5vw,20px)}
+.footer{padding-block:7px}
+@media(max-width:900px){
+ body{padding:0}.shell{height:100dvh;min-height:0;border-radius:0}
+ .header{flex-direction:row;align-items:center}
+ .main{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(190px,38vh)}
+ .map-pane{min-height:0}.panel{border-left:0;border-top:1px solid rgba(184,157,94,.55)}
+}
+@media(max-width:560px),(max-height:620px){
+ .header{gap:8px;padding:7px 9px}.header small{display:none}h1{font-size:clamp(15px,4vw,20px)}
+ .zoom{gap:4px}.zoom button{padding:6px 8px}.zoom button:last-child{display:none}
+ .main{grid-template-rows:minmax(0,1fr) minmax(165px,36vh)}
+ .panel{padding:9px;gap:8px}.tabs{gap:4px}.tab{padding:6px 4px;font-size:12px}
+ .card{padding:10px}h2{font-size:18px;margin-bottom:6px}.body{font-size:13px;line-height:1.35}
+ .controls{margin-top:8px;gap:4px}.controls button{padding:6px 8px;font-size:12px}
+ .speed-control{margin-top:8px}.battle-gallery{display:none}.footer{display:none}
+}
+
+
+/* ==========================================================
+   Единая автоподгонка всего интерактивного модуля
+   Эталонный холст 1280 x 800 масштабируется целиком.
+   ========================================================== */
+html,body{width:100%;height:100%;min-width:0;min-height:0;margin:0;overflow:hidden!important;background:#152019}
+body{position:relative;padding:0!important}
+.shell{position:absolute!important;left:0;top:0;width:1280px!important;height:800px!important;min-width:1280px!important;min-height:800px!important;max-width:none!important;max-height:none!important;margin:0!important;display:grid!important;grid-template-rows:auto minmax(0,1fr) auto!important;transform-origin:0 0;overflow:hidden!important;border-radius:14px!important}
+.header{flex-direction:row!important;align-items:center!important;padding:14px 20px!important}
+.main{height:100%!important;min-height:0!important;grid-template-columns:minmax(0,1fr) 320px!important;grid-template-rows:minmax(0,1fr)!important}
+.map-pane{height:100%!important;min-height:0!important;padding:14px!important}
+.panel{height:100%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;border-left:1px solid rgba(184,157,94,.55)!important;border-top:0!important;padding:16px!important;gap:12px!important}
+.footer{display:none!important}
+.battle-gallery{grid-template-columns:1fr 1fr!important}
+
+</style>
+
+<style id="adaptive-iframe-layout">
+html,body{width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;margin:0!important;overflow:hidden!important;background:#152019}
+body{position:static!important;padding:0!important}
+.shell{position:static!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;margin:0!important;transform:none!important;border-radius:0!important;display:grid!important;grid-template-rows:auto minmax(0,1fr)!important;overflow:hidden!important}
+.header{min-height:0!important;padding:clamp(7px,1.15vh,16px) clamp(10px,1.35vw,20px)!important;flex-direction:row!important;align-items:center!important}
+.header h1{font-size:clamp(17px,2.1vw,29px)!important}
+.main{width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;grid-template-columns:minmax(0,76%) minmax(220px,24%)!important;grid-template-rows:minmax(0,1fr)!important}
+.map-pane{width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;padding:clamp(7px,1.2vw,16px)!important;overflow:hidden!important}
+.stage{width:auto!important;max-width:94%!important;max-height:94%!important;transform-origin:center center!important}
+.stage svg{width:100%!important;height:auto!important;max-height:100%!important}
+.panel{width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;overflow-x:hidden!important;overflow-y:auto!important;border-left:1px solid rgba(184,157,94,.55)!important;border-top:0!important;padding:clamp(8px,1.25vw,18px)!important;gap:clamp(7px,1.15vh,14px)!important}
+.card{padding:clamp(9px,1.1vw,16px)!important}.footer{display:none!important}
+@media(max-aspect-ratio:5/4){.main{grid-template-columns:minmax(0,70%) minmax(210px,30%)!important}}
+@media(max-width:760px){.main{grid-template-columns:minmax(0,68%) minmax(190px,32%)!important}.header small{display:none!important}.zoom button:last-child{display:none!important}.panel{padding:7px!important;gap:6px!important}.card{padding:8px!important}.battle-gallery{display:none!important}}
+</style>
+
+<style id="mobile-module-shell-clean">
+/* Mobile shell for interactive_map_002. Desktop rules above stay unchanged. */
+@media (max-width: 760px) {
+  html, body {
+    width: 100% !important;
+    height: 100% !important;
+    height: 100dvh !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #152019 !important;
+  }
+
+  body { position: static !important; }
+
+  .shell {
+    position: static !important;
+    width: 100% !important;
+    height: 100dvh !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    overflow: hidden !important;
+    display: grid !important;
+    grid-template-rows: 50px minmax(0, 1fr) !important;
+  }
+
+  .header {
+    height: 50px !important;
+    min-height: 50px !important;
+    padding: 6px 10px !important;
+    gap: 6px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    overflow: hidden !important;
+  }
+  .header > div:first-child { min-width: 0 !important; width: 100% !important; }
+  .header small { display: none !important; }
+  .header h1 {
+    margin: 0 !important;
+    max-width: 100% !important;
+    font-size: clamp(15px, 4.5vw, 19px) !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .zoom { display: none !important; }
+
+  .main {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: minmax(0, 56%) minmax(0, 44%) !important;
+    overflow: hidden !important;
+  }
+
+  .map-pane {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 4px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    touch-action: manipulation !important;
+  }
+
+  .stage {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transform-origin: center center !important;
+  }
+  .stage > svg {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    border-width: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .panel {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 8px 10px calc(10px + env(safe-area-inset-bottom)) !important;
+    gap: 7px !important;
+    border-left: 0 !important;
+    border-top: 1px solid rgba(184,157,94,.55) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .tabs {
+    position: sticky !important;
+    top: -8px !important;
+    z-index: 3 !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 5px !important;
+    margin: 0 !important;
+    padding: 0 0 3px !important;
+    background: var(--panel) !important;
+  }
+  .tab { padding: 6px 5px !important; font-size: 11px !important; line-height: 1.15 !important; }
+
+  .card { padding: 9px 10px !important; border-radius: 10px !important; }
+  .eyebrow { font-size: 9px !important; }
+  h2 { margin: 3px 0 5px !important; font-size: 17px !important; line-height: 1.15 !important; }
+  .body { font-size: 12.5px !important; line-height: 1.32 !important; }
+  .meta { font-size: 10.5px !important; line-height: 1.3 !important; }
+  .progress { margin: 7px 0 4px !important; }
+  .controls { margin-top: 7px !important; gap: 5px !important; }
+  .controls button { padding: 7px 9px !important; font-size: 11px !important; }
+  .speed-control { margin-top: 7px !important; font-size: 10px !important; }
+  .speed-control label { margin-bottom: 4px !important; }
+  .speed-control input { min-height: 28px !important; }
+
+  .battle-gallery { display: none !important; }
+  .panel > .card:last-child { display: none !important; }
+  .footer { display: none !important; }
+}
+
+@media (max-width: 760px) and (orientation: landscape) {
+  .shell { grid-template-rows: 44px minmax(0, 1fr) !important; }
+  .header { height: 44px !important; min-height: 44px !important; padding: 5px 9px !important; }
+  .header h1 { font-size: clamp(14px, 2.5vw, 18px) !important; }
+  .main {
+    grid-template-columns: minmax(0, 66%) minmax(0, 34%) !important;
+    grid-template-rows: 1fr !important;
+  }
+  .panel {
+    border-top: 0 !important;
+    border-left: 1px solid rgba(184,157,94,.55) !important;
+    padding-bottom: 8px !important;
+  }
+}
+</style>
+
+</head>
+<body>
+<div class="shell">
+<header class="header"><div><small>Интерактивная карта</small><h1>Нашествие Батыя на Северо-Восточную Русь</h1></div><div class="zoom"><button id="minus">−</button><span id="zoomLabel">100%</span><button id="plus">+</button><button id="fit">По размеру</button></div></header>
+<div class="main">
+<section class="map-pane"><div class="stage" id="stage"><svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100%" height="100%" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="991 7069 18664 14002" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Карта походов Батыя на Северо-Восточную Русь"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .str0 {stroke:black;stroke-width:20}
+    .fil0 {fill:none}
+    .fil2 {fill:#6666FF}
+    .fil1 {fill:red}
+   ]]>
+  </style>
+   <clipPath id="id0">
+    <rect x="991" y="7069" width="18664" height="14002"/>
+   </clipPath>
+ </defs>
+ <g id="Слой_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g style="clip-path:url(#id0)">
+   <image x="991" y="7069" width="18664" height="14002" xlink:href="assets/map.png"/>
+  </g>
+ </g>
+ <g id="path1">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <path class="fil0 str0" d="M19229 15707c-2101,1281 -4719,2382 -9250,2815 -1095,-252 -2065,-1344 -2873,-2508 -369,-531 -1274,-1374 -895,-1736 2117,-2542 4154,-940 4546,-2487 -256,-730 -1048,-692 -863,-1312 286,-785 -45,-1353 -719,-1799"/>
+  <path class="fil0 str0" d="M10915 11331c37,-182 103,-501 130,-675 23,-148 184,-893 262,-1008"/>
+  <path class="fil0 str0" d="M11254 11659c168,0 1961,11 2077,-71 8,-6 29,-3 40,-3"/>
+ </g>
+ <g id="path02">
+  <metadata id="CorelCorpID_2Corel-Layer"/>
+  <path class="fil0 str0" d="M17212 19395c-330,-90 -3395,-3361 -3905,-3655 -1325,-762 -1328,-1463 -191,-1975 596,-268 -79,-473 -899,-847"/>
+ </g>
+ <g id="battles">
+  <metadata id="CorelCorpID_3Corel-Layer"/>
+  <path class="fil1" d="M6688 16429c3,-4 6,-12 9,-17 29,-58 21,-50 80,-79 5,-3 13,-6 17,-9 -9,-12 -21,-24 -31,-35 -11,-12 -21,-24 -32,-36l-60 -67c-1,-2 -3,-2 -4,-4l-36 -40c-2,-2 -2,-3 -4,-5l-20 -22c-14,-16 -31,-33 -44,-49 -9,-10 -24,-26 -31,-35l-29 -31c-8,-11 -22,-25 -31,-36l-21 -22c-2,-4 -5,-6 -8,-9 -2,-4 -5,-6 -8,-9 -2,-3 -5,-6 -7,-9 -6,-7 -11,-13 -18,-16 -16,-6 -35,-12 -51,-17 -17,-6 -34,-11 -51,-17l-76 -25c-25,-9 -36,8 -30,27l26 76c11,34 22,68 33,102 3,8 8,12 16,18l71 64c4,2 6,5 9,8l107 96c4,2 6,5 10,7l35 32c16,16 45,39 63,56l18 16c10,9 42,38 53,48l45 39zm-311 -105c18,11 53,23 68,37 14,13 29,55 39,68l26 -23c3,-2 6,-6 9,-8l36 -32 -14 -14c-6,-4 -10,-8 -16,-13 -18,-17 -42,-37 -60,-53l-30 -27c-2,3 -4,5 -7,8 -7,7 -29,33 -36,41l-15 16zm536 145c-10,8 -81,81 -81,82l87 63c2,2 4,3 6,5 2,2 4,2 6,4 0,1 -4,43 34,60 27,13 55,4 70,-12 16,-16 24,-45 11,-70 -5,-11 -14,-19 -23,-25 -14,-8 -21,-8 -38,-8 -7,-8 -12,-17 -18,-25l-54 -74zm-726 99c-17,0 -26,1 -38,8 -10,6 -18,14 -23,25 -27,52 28,107 80,82 39,-18 34,-59 35,-60 3,-3 8,-6 12,-9l87 -63c-1,-1 -72,-75 -81,-82 -9,10 -27,37 -36,49 -11,15 -26,37 -36,50zm783 -218c4,-13 -5,-20 -10,-26 -23,-23 -23,-25 -48,-13 -9,4 -17,8 -26,13 -41,20 -86,42 -126,63 -6,3 -7,4 -10,10l-70 139c-13,26 -21,33 -2,52 5,4 14,15 20,18 12,6 21,-1 27,-7l209 -209c8,-7 34,-31 36,-40zm-770 -2c2,9 12,17 17,21 6,7 12,13 19,19l209 210c21,21 31,7 47,-9 5,-5 14,-12 12,-25 -1,-6 -20,-43 -24,-51l-51 -101c-13,-27 -8,-21 -40,-37l-127 -63c-26,-13 -26,-12 -49,11 -5,5 -14,12 -13,25zm413 -287l63 70c2,2 2,3 4,4l51 57c3,4 5,6 8,9 5,-2 14,-12 19,-16l78 -70c2,-1 3,-2 5,-4l63 -56c6,-6 13,-30 16,-40l46 -139c3,-9 8,-19 3,-29 -11,-19 -33,-6 -53,1l-138 45c-9,4 -20,6 -25,12l-31 34c-10,13 -28,31 -39,44 -7,9 -28,30 -35,38 -7,9 -16,18 -22,25l-13 15z"/>
+  <path class="fil1" d="M8289 8817c2,-4 6,-12 8,-17 30,-58 21,-50 80,-79 6,-3 14,-6 18,-9 -9,-12 -22,-24 -31,-35 -11,-12 -22,-24 -32,-36l-60 -67c-2,-2 -3,-2 -4,-4l-36 -40c-2,-2 -3,-3 -4,-5l-20 -22c-14,-16 -31,-33 -44,-49 -9,-10 -25,-26 -32,-35l-28 -31c-8,-11 -22,-25 -32,-36l-20 -22c-3,-4 -5,-6 -8,-9 -3,-4 -5,-6 -8,-9 -2,-3 -5,-6 -8,-9 -5,-7 -10,-13 -18,-16 -15,-6 -34,-12 -50,-17 -17,-6 -34,-11 -51,-17l-76 -25c-25,-9 -37,8 -30,27l25 76c11,34 23,68 34,102 3,8 8,12 15,18l72 64c3,2 6,5 9,8l107 95c3,3 6,6 9,8l36 32c16,16 45,39 62,56l18 16c11,9 43,38 54,48l45 39zm-311 -105c18,11 53,23 68,37 14,13 29,55 38,68l27 -23c3,-2 6,-6 9,-8l36 -32 -15 -14c-5,-4 -10,-8 -15,-13 -18,-17 -43,-37 -60,-53l-30 -27c-3,3 -4,5 -7,8 -8,7 -29,33 -37,41l-14 16zm536 145c-10,8 -81,81 -82,82l87 63c3,2 4,3 7,5 2,2 4,2 5,4 1,1 -3,43 35,60 26,13 55,4 70,-12 15,-16 23,-45 10,-70 -5,-11 -13,-19 -23,-25 -13,-8 -20,-8 -37,-8 -7,-8 -13,-17 -19,-25l-53 -74zm-727 99c-16,0 -25,1 -38,8 -9,6 -17,14 -23,25 -26,52 28,107 81,82 38,-18 34,-59 34,-60 3,-3 9,-6 12,-9l88 -63c-1,-1 -72,-75 -82,-82 -8,10 -26,37 -36,49 -10,15 -26,37 -36,50zm784 -218c4,-13 -5,-20 -10,-26 -23,-23 -24,-25 -49,-13 -8,4 -16,8 -25,13 -41,20 -87,42 -127,63 -5,3 -6,4 -9,10l-70 139c-13,26 -21,33 -2,52 5,4 14,15 20,18 12,6 21,-1 27,-7l209 -209c7,-7 34,-31 36,-40zm-770 -2c1,9 11,17 16,21 7,7 13,13 19,19l209 210c22,21 32,7 47,-9 5,-5 15,-12 13,-25 -1,-6 -21,-43 -25,-51l-50 -101c-14,-27 -9,-21 -40,-37l-127 -63c-26,-13 -27,-12 -49,11 -5,5 -15,12 -13,25zm413 -287l63 70c1,2 2,3 3,4l52 57c2,4 5,6 7,9 6,-2 15,-12 20,-16l78 -70c1,-1 3,-2 5,-4l63 -56c6,-6 12,-30 16,-40l46 -139c3,-9 8,-19 2,-29 -10,-19 -32,-6 -52,1l-138 45c-10,4 -20,6 -26,12l-30 34c-11,13 -28,30 -39,44 -8,9 -28,30 -35,38 -7,9 -16,18 -22,25l-13 15z"/>
+ </g>
+ <g id="cities">
+  <metadata id="CorelCorpID_4Corel-Layer"/>
+  <circle class="fil2" cx="8158" cy="17263" r="143"/>
+  <circle class="fil2" cx="7367" cy="16223" r="143"/>
+  <circle class="fil2" cx="6438" cy="15130" r="143"/>
+  <circle class="fil2" cx="10410" cy="12598" r="143"/>
+  <circle class="fil2" cx="10740" cy="11760" r="143"/>
+  <circle class="fil2" cx="9843" cy="10699" r="143"/>
+  <circle class="fil2" cx="9899" cy="9469" r="143"/>
+  <circle class="fil2" cx="11267" cy="9000" r="143"/>
+  <circle class="fil2" cx="12201" cy="14903" r="143"/>
+  <circle class="fil2" cx="15336" cy="13218" r="143"/>
+  <circle class="fil2" cx="12201" cy="12956" r="143"/>
+ </g>
+
+<g id="runtime"></g></svg></div></section>
+<aside class="panel">
+<div class="tabs"><button class="tab active" data-route="first">Первый поход<br>1237–1238</button><button class="tab" data-route="second">Второй поход<br>1239</button></div>
+<div class="card"><div class="eyebrow" id="kind">Маршрут</div><h2 id="title">Первый поход Батыя</h2><div class="body" id="text">Нажмите «Старт», чтобы проследить движение войск по маршрутам, отмеченным в SVG.</div><div class="progress"><i id="bar"></i></div><div class="meta" id="status">Готово к запуску</div><div class="controls"><button class="primary" id="play">▶ Старт</button><button id="pause">Ⅱ Пауза</button><button id="reset">↻ Сброс</button></div><div class="speed-control"><label for="speed"><span>Скорость движения</span><strong id="speedLabel">Нормально</strong></label><input id="speed" type="range" min="0.35" max="1.8" step="0.05" value="0.75"></div></div>
+<div class="card"><div class="eyebrow">Места сражений</div><div class="battle-gallery" id="battleGallery">
+<button class="battle-card" data-battle="0"><img src="assets/battle_kolomna.png" alt="Фрагмент карты у Коломны"><span>Сражение под Коломной</span></button>
+<button class="battle-card" data-battle="1"><img src="assets/battle_sit.png" alt="Фрагмент карты у реки Сить"><span>Ситская битва</span></button>
+</div></div>
+<div class="card"><div class="meta">Во время движения маршрут автоматически показывает сведения о ближайшем городе или месте сражения. По объектам карты также можно нажимать вручную.</div></div>
+</aside></div>
+</div>
+<script>
+const cityData=[
+ {name:'Рязань',text:'В декабре 1237 года город выдержал несколько дней осады, затем был взят штурмом, разорён и сожжён. Старая Рязань уже не восстановила прежнего значения.'},
+ {name:'Коломна',text:'В январе 1238 года под Коломной произошло крупное сражение объединённых русских сил с монгольским войском. После поражения русских город был взят.'},
+ {name:'Москва',text:'Небольшая тогда крепость была осаждена, взята и сожжена в январе 1238 года; князь Владимир Юрьевич попал в плен.'},
+ {name:'Владимир',text:'Столица Владимиро-Суздальской земли была взята 7 февраля 1238 года и сильно разорена. Во время штурма погибла княжеская семья.'},
+ {name:'Суздаль',text:'В феврале 1238 года Суздаль был захвачен и разорён монгольскими отрядами.'},
+ {name:'Ростов',text:'Ростов открыл ворота без длительной осады и, по летописной традиции, избежал полного разрушения, хотя оказался под властью завоевателей.'},
+ {name:'Ярославль',text:'Ярославль был взят и разорён. Археологические находки свидетельствуют о массовой гибели жителей во время нашествия.'},
+ {name:'Кострома',text:'Костромская земля оказалась в зоне действий монгольских отрядов. Источники не дают столь подробного описания судьбы города, как для Владимира или Рязани.'},
+ {name:'Муром',text:'Муромское княжество пострадало уже на начальном этапе нашествия; город и округа оказались под ударом монгольских войск.'},
+ {name:'Нижний Новгород',text:'Нижний Новгород находился у восточной границы Руси. Подробного летописного рассказа о его штурме в этот поход не сохранилось.'},
+ {name:'Гороховец',text:'Гороховец находился на пути отдельных отрядов. Прямые сведения о масштабах его разорения в 1238 году ограничены.'}
+];
+const battleData=[
+ {name:'Сражение под Коломной',text:'В январе 1238 года объединённые силы Рязанского и Владимирского княжеств встретили монголов у Коломны. Русское войско потерпело поражение, после чего путь к Москве и Владимиру оказался открыт.'},
+ {name:'Ситская битва',text:'4 марта 1238 года на реке Сить отряд Бурундая разгромил войско великого князя Юрия Всеволодовича. Князь погиб, а организованное сопротивление Северо-Восточной Руси было серьёзно ослаблено.'}
+];
+const routeInfo={first:{title:'Первый поход Батыя',text:'Зимой 1237–1238 годов войска прошли через Рязанскую и Владимиро-Суздальскую земли. SVG содержит основной маршрут и несколько ответвлений.'},second:{title:'Второй поход Батыя',text:'В 1239 году новый этап похода был направлен к южным и юго-восточным русским землям. На карте он обозначен жёлтым маршрутом.'}};
+const cities=[...document.querySelectorAll('#cities circle')]; const battles=[...document.querySelectorAll('#battles path')];
+cities.forEach((el,i)=>{el.dataset.type='city';el.dataset.index=i;el.setAttribute('tabindex','0');el.setAttribute('aria-label',cityData[i]?.name||'Город')});
+battles.forEach((el,i)=>{el.dataset.type='battle';el.dataset.index=i;el.setAttribute('tabindex','0');el.setAttribute('aria-label',battleData[i]?.name||'Место сражения')});
+const title=document.getElementById('title'),text=document.getElementById('text'),kind=document.getElementById('kind'),status=document.getElementById('status'),bar=document.getElementById('bar'),runtime=document.getElementById('runtime');
+let mode='first',playing=false,raf=0,progressMs=0,lastFrame=0,baseDuration=18000,zoom=1;
+let speed=0.75,holdUntil=0,holdKey='';
+let announced=new Set();
+function clearSelected(){document.querySelectorAll('.selected,.battle-card.active').forEach(e=>e.classList.remove('selected','active'))}
+function showObject(el,automatic=false){clearSelected();el.classList.add('selected');const d=el.dataset.type==='city'?cityData[+el.dataset.index]:battleData[+el.dataset.index];kind.textContent=el.dataset.type==='city'?'Город':'Место сражения';title.textContent=d.name;text.textContent=d.text;status.textContent=automatic?'Маршрут проходит рядом с объектом':'Объект выбран на карте';if(el.dataset.type==='battle')document.querySelector(`.battle-card[data-battle="${el.dataset.index}"]`)?.classList.add('active')}
+[...cities,...battles].forEach(el=>{el.addEventListener('click',()=>showObject(el));el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showObject(el)}})});
+function paths(){return [...document.querySelectorAll(mode==='first'?'#path1 path':'#path02 path')]}
+function setupRoute(){cancelAnimationFrame(raf);playing=false;progressMs=0;lastFrame=0;holdUntil=0;holdKey='';announced.clear();runtime.innerHTML='';bar.style.width='0%';const info=routeInfo[mode];kind.textContent='Маршрут';title.textContent=info.title;text.textContent=info.text;status.textContent='Готово к запуску';document.getElementById('play').textContent='▶ Старт';document.querySelectorAll('#path1,#path02').forEach(g=>g.style.opacity='0.12');document.querySelector(mode==='first'?'#path1':'#path02').style.opacity='1'}
+function buildRuntime(){runtime.innerHTML='';const pths=paths();return pths.map(p=>{const clone=p.cloneNode();clone.removeAttribute('class');clone.setAttribute('class','route-progress');const len=p.getTotalLength();clone.style.strokeDasharray=len;clone.style.strokeDashoffset=len;runtime.appendChild(clone);return {source:p,draw:clone,len}})}
+let segments=[];
+function frame(now){
+ if(!playing)return;
+ if(!lastFrame)lastFrame=now;
+ const dt=Math.min(80,now-lastFrame);lastFrame=now;
+ if(now>=holdUntil)progressMs+=dt*speed;
+ const t=Math.min(1,progressMs/baseDuration);
+ const total=segments.reduce((a,s)=>a+s.len,0),target=t*total;let acc=0,markerPoint=null;
+ for(const s of segments){const local=Math.max(0,Math.min(s.len,target-acc));s.draw.style.strokeDashoffset=s.len-local;if(target>=acc&&target<=acc+s.len)markerPoint=s.source.getPointAtLength(local);acc+=s.len}
+ runtime.querySelector('.route-marker')?.remove();
+ if(markerPoint){
+  const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.setAttribute('class','route-marker');c.setAttribute('r','135');c.setAttribute('cx',markerPoint.x);c.setAttribute('cy',markerPoint.y);runtime.appendChild(c);
+  const candidates=[...cities,...battles];let nearest=null,dist=Infinity;
+  for(const el of candidates){const box=el.getBBox();const cx=box.x+box.width/2,cy=box.y+box.height/2;const d=Math.hypot(markerPoint.x-cx,markerPoint.y-cy);if(d<dist){dist=d;nearest=el}}
+  const limit=nearest?.dataset.type==='battle'?520:430;const key=nearest?`${nearest.dataset.type}:${nearest.dataset.index}`:'';
+  if(nearest&&dist<limit&&!announced.has(key)){
+   announced.add(key);showObject(nearest,true);
+   const data=nearest.dataset.type==='city'?cityData[+nearest.dataset.index]:battleData[+nearest.dataset.index];
+   if(data?.text){holdUntil=now+2400;holdKey=key;status.textContent='Остановка: историческая справка';}
+  }
+ }
+ bar.style.width=(t*100)+'%';
+ if(now>=holdUntil)status.textContent='Пройдено '+Math.round(t*100)+'% маршрута';
+ if(t<1)raf=requestAnimationFrame(frame);else{playing=false;progressMs=baseDuration;document.getElementById('play').textContent='▶ Сначала';status.textContent='Маршрут завершён'}
+}
+function play(){if(progressMs>=baseDuration){setupRoute()}if(!segments.length||!runtime.children.length)segments=buildRuntime();playing=true;lastFrame=0;document.getElementById('play').textContent='▶ Продолжить';raf=requestAnimationFrame(frame)}
+function pause(){if(!playing)return;playing=false;cancelAnimationFrame(raf);lastFrame=0;status.textContent='Пауза'}
+document.getElementById('play').addEventListener('click',play);document.getElementById('pause').addEventListener('click',pause);document.getElementById('reset').addEventListener('click',()=>{segments=[];setupRoute()});
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.route;segments=[];setupRoute()}));
+document.querySelectorAll('.battle-card').forEach(btn=>btn.addEventListener('click',()=>showObject(battles[+btn.dataset.battle])));
+function setZoom(v){zoom=Math.max(.7,Math.min(1.8,v));document.getElementById('stage').style.transform=`scale(${zoom})`;document.getElementById('zoomLabel').textContent=Math.round(zoom*100)+'%'}
+
+const speedInput=document.getElementById('speed'),speedLabel=document.getElementById('speedLabel');
+function updateSpeed(){speed=Number(speedInput.value);speedLabel.textContent=speed<0.6?'Медленно':speed<1.05?'Нормально':speed<1.45?'Быстро':'Очень быстро'}
+speedInput.addEventListener('input',updateSpeed);updateSpeed();
+
+document.getElementById('plus').onclick=()=>setZoom(zoom+.1);document.getElementById('minus').onclick=()=>setZoom(zoom-.1);document.getElementById('fit').onclick=()=>setZoom(1);
+setupRoute();
+</script>
+
+<script>
+(() => {
+  const pane = document.querySelector('.map-pane');
+  const stage = document.getElementById('stage');
+  const svg = stage?.querySelector('svg');
+  if (!pane || !stage || !svg) return;
+  const viewBox = svg.viewBox?.baseVal;
+  const ratio = viewBox && viewBox.height ? viewBox.width / viewBox.height : 4/3;
+  function fitStageToPane(){
+    const pw=Math.max(1,pane.clientWidth), ph=Math.max(1,pane.clientHeight);
+    const width=Math.max(1,Math.min(pw*.94,ph*.94*ratio));
+    stage.style.width=width+'px';
+  }
+  const ro=new ResizeObserver(fitStageToPane); ro.observe(pane);
+  window.addEventListener('resize',fitStageToPane,{passive:true});
+  fitStageToPane();
+})();
+</script>
+</body></html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <title>История нашего края — электронный учебник</title>
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="app/styles/reader.css?v=desktop-toc-height-lock-4">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand"><span class="brand-icon">▣</span><div><strong id="bookTitle">История нашего края. 5 класс</strong><small>Электронный учебник</small></div></div>
+    <label class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="Поиск по содержимому учебника…" autocomplete="off"><button id="searchClear" class="search-clear" type="button" title="Очистить поиск" aria-label="Очистить поиск" hidden>×</button><button id="searchPrev" type="button" title="Предыдущее">↑</button><button id="searchNext" type="button" title="Следующее">↓</button><output id="searchCount"></output></label>
+    <div class="top-actions">
+      <button id="toggleToc" aria-controls="tocPanel" aria-expanded="true">Содержание</button>
+      <button id="mobileBookmarks" class="mobile-only-action" aria-controls="bookmarksPanel">Закладки</button>
+      <button id="mobileNotes" class="mobile-only-action" aria-controls="notesPanel">Заметки</button>
+      <button id="fullscreenBtn">Полный экран</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="panel panel-left is-open" id="tocPanel" aria-hidden="false">
+      <div class="panel-title"><span>❧</span><b>Содержание</b><button id="closeToc">×</button></div>
+      <nav id="tocList" class="toc-list"></nav>
+    </aside>
+
+    <section class="reader-stage">
+      <button class="page-arrow left" id="prevBtn" aria-label="Назад">‹</button>
+      <div class="book-frame"><iframe id="bookFrame" title="Учебник" src="book/NN-history-5.html?v=single-page-light-1"></iframe></div>
+      <button class="page-arrow right" id="nextBtn" aria-label="Вперёд">›</button>
+    </section>
+
+    <aside class="right-column">
+      <section class="panel compact" id="bookmarksPanel"><div class="panel-title"><span>🔖</span><b>Закладки</b><button id="closeBookmarks" class="mobile-drawer-close" type="button" aria-label="Закрыть закладки">×</button><button id="addBookmark" class="single-bookmark-add" type="button" title="Добавить закладку на текущей странице" aria-label="Добавить закладку">＋</button></div><div id="bookmarkList" class="item-list"></div></section>
+      <section class="panel notes" id="notesPanel"><div class="panel-title"><span>✎</span><b>Заметки</b><button id="closeNotes" class="mobile-drawer-close" type="button" aria-label="Закрыть заметки">×</button><button id="addNote">＋</button></div><div id="noteList" class="item-list"></div></section>
+    </aside>
+  </main>
+
+  <footer class="bottombar">
+    <div class="desktop-panel-controls" aria-label="Боковые панели">
+      <button id="homeBtn" class="home">⌂ <span>Домой</span></button>
+      <button id="desktopTocToggle" class="desktop-panel-toggle is-active" type="button" aria-controls="tocPanel" aria-expanded="true" title="Показать или скрыть содержание"><span aria-hidden="true">☰</span><span>Содержание</span></button>
+      <button id="desktopBookmarksToggle" class="desktop-panel-toggle is-active" type="button" aria-controls="bookmarksPanel" aria-expanded="true" title="Показать или скрыть закладки"><span aria-hidden="true">🔖</span><span>Закладки</span></button>
+      <button id="desktopNotesToggle" class="desktop-panel-toggle is-active" type="button" aria-controls="notesPanel" aria-expanded="true" title="Показать или скрыть заметки"><span aria-hidden="true">✎</span><span>Заметки</span></button>
+    </div>
+    <div class="footer-navigation">
+      <div class="page-nav"><button id="bottomPrev">‹</button><label>Стр. <input id="pageInput" value="1" inputmode="numeric" enterkeyhint="go" aria-label="Номер страницы"></label><button id="pageGo" class="page-go" type="button" title="Перейти к странице" aria-label="Перейти к странице">OK</button><button id="bottomNext">›</button></div>
+    </div>
+    <div class="zoom-controls" aria-label="Масштаб страницы"><span class="zoom-label">Страница</span><input id="pageZoomRange" type="range" min="60" max="160" step="5" value="100" aria-label="Масштаб страницы"><output id="pageZoomValue">100%</output></div>
+    <div class="font-controls" aria-label="Размер шрифта"><button id="fontDown" title="Уменьшить шрифт">A−</button><output id="fontScale">100%</output><button id="fontUp" title="Увеличить шрифт">A＋</button></div>
+  </footer>
+  <div id="mobileDrawerBackdrop" class="mobile-drawer-backdrop" hidden></div>
+</div>
+<div id="imageViewer" class="image-viewer" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Просмотр изображения">
+  <button id="imageViewerClose" class="image-viewer-close" type="button" aria-label="Закрыть">×</button>
+  <div class="image-viewer-stage">
+    <div id="imageViewerCanvas" class="image-viewer-canvas">
+      <img id="imageViewerImage" alt="" draggable="false" />
+    </div>
+    <p id="imageViewerCaption" class="image-viewer-caption"></p>
+  </div>
+  <div class="image-viewer-controls" aria-label="Масштаб изображения">
+    <button id="imageViewerZoomOut" type="button" aria-label="Уменьшить">−</button>
+    <output id="imageViewerZoomValue">100%</output>
+    <button id="imageViewerZoomIn" type="button" aria-label="Увеличить">＋</button>
+    <button id="imageViewerReset" type="button">По размеру экрана</button>
+  </div>
+</div>
+
+<div id="interactiveModuleViewer" class="interactive-module-viewer" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Интерактивный модуль">
+  <button id="interactiveModuleClose" class="interactive-module-close" type="button" aria-label="Закрыть интерактивный модуль">×</button>
+  <iframe id="interactiveModuleFrame" class="interactive-module-frame" title="Интерактивный учебный модуль" loading="eager"></iframe>
+</div>
+
+<dialog id="noteDialog"><form method="dialog"><h3>Заметка</h3><p id="noteSelectionHint" class="note-selection-hint"></p><div class="note-color-row"><span>Цвет выделения</span><button class="note-color selected" data-color="#ffe58a" style="--swatch:#ffe58a" title="Жёлтый"></button><button class="note-color" data-color="#bfe7b5" style="--swatch:#bfe7b5" title="Зелёный"></button><button class="note-color" data-color="#b9dcff" style="--swatch:#b9dcff" title="Голубой"></button><button class="note-color" data-color="#f6bfd8" style="--swatch:#f6bfd8" title="Розовый"></button></div><textarea id="noteText" rows="7" placeholder="Введите текст заметки…"></textarea><div class="dialog-actions"><button value="cancel">Отмена</button><button id="saveNote" value="default">Сохранить</button></div></form></dialog>
+<script src="config/reader-config.js"></script>
+<script src="app/services/storage.js"></script>
+<script src="app/bookmarks.js?v=mobile-notes-step4"></script>
+<script src="app/reader.js?v=desktop-toc-height-lock-4"></script>
+</body>
+</html>

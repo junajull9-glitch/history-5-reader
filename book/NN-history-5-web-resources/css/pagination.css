@@ -1,0 +1,338 @@
+/* ==========================================================
+   pagination.css
+   Правила пагинации электронной книги.
+
+   ВАЖНО:
+   1. Подключать этот файл ПОСЛЕДНИМ.
+   2. Экранный ридер использует CSS Columns.
+   3. Для печати используются обычные страничные разрывы.
+   4. Учтены два варианта Chapter1:
+      - обычный <p class="Chapter1">
+      - Chapter1 внутри <div class="Текстовый-фрейм">
+   ========================================================== */
+
+
+/* ==========================================================
+   1. НОВАЯ ГЛАВА
+   ========================================================== */
+
+@media screen {
+
+    /*
+     * Chapter1 непосредственно в основном потоке.
+     */
+    p.Chapter1 {
+        break-before: column !important;
+        -webkit-column-break-before: always !important;
+    }
+
+    /*
+     * Chapter1 внутри отдельного текстового фрейма InDesign.
+     * Разрыв ставится перед внешним контейнером, потому что именно
+     * он является элементом основного колонного потока.
+     */
+    div.Текстовый-фрейм:has(> p.Chapter1),
+    div[class~="Текстовый-фрейм"]:has(> p.Chapter1) {
+        break-before: column !important;
+        -webkit-column-break-before: always !important;
+    }
+
+    /*
+     * Внутри такого фрейма дополнительный разрыв у самого p
+     * не нужен, иначе браузер может сформировать пустую колонку.
+     */
+    div.Текстовый-фрейм > p.Chapter1,
+    div[class~="Текстовый-фрейм"] > p.Chapter1 {
+        break-before: auto !important;
+        -webkit-column-break-before: auto !important;
+    }
+}
+
+@media print {
+
+    p.Chapter1 {
+        break-before: page !important;
+        page-break-before: always !important;
+    }
+
+    div.Текстовый-фрейм:has(> p.Chapter1),
+    div[class~="Текстовый-фрейм"]:has(> p.Chapter1) {
+        break-before: page !important;
+        page-break-before: always !important;
+    }
+
+    div.Текстовый-фрейм > p.Chapter1,
+    div[class~="Текстовый-фрейм"] > p.Chapter1 {
+        break-before: auto !important;
+        page-break-before: auto !important;
+    }
+}
+
+
+/* ==========================================================
+   2. НОВЫЙ ПАРАГРАФ
+   ========================================================== */
+
+@media screen {
+    p.Paragraph {
+        break-before: column !important;
+        -webkit-column-break-before: always !important;
+    }
+}
+
+@media print {
+    p.Paragraph {
+        break-before: page !important;
+        page-break-before: always !important;
+    }
+}
+
+
+/* ==========================================================
+   2.1. НОВЫЙ РАЗДЕЛ ITEM
+   ========================================================== */
+
+@media screen {
+    p.item,
+    p.Item {
+        break-before: column !important;
+        -webkit-column-break-before: always !important;
+        break-after: avoid-column !important;
+        -webkit-column-break-after: avoid !important;
+    }
+}
+
+@media print {
+    p.item,
+    p.Item {
+        break-before: page !important;
+        page-break-before: always !important;
+        break-after: avoid-page !important;
+        page-break-after: avoid !important;
+    }
+}
+
+
+/* ==========================================================
+   3. ЗАГОЛОВОК НЕ ОТРЫВАТЬ ОТ СЛЕДУЮЩЕГО БЛОКА
+   ========================================================== */
+
+@media screen {
+    p.HeadRED,
+    p.HeadBlue,
+    p.ResultHead,
+    p.HeadGreen {
+        break-after: avoid-column !important;
+        -webkit-column-break-after: avoid !important;
+    }
+}
+
+@media print {
+    p.HeadRED,
+    p.HeadBlue,
+    p.ResultHead,
+    p.HeadGreen {
+        break-after: avoid-page !important;
+        page-break-after: avoid !important;
+    }
+}
+
+
+/* ==========================================================
+   4. ИКОНКА НЕ ДОЛЖНА ОТРЫВАТЬСЯ ОТ СЛЕДУЮЩЕГО ТЕКСТА
+   ========================================================== */
+
+@media screen {
+
+    ._idGenObjectLayout-1:has(> .icon-1),
+    ._idGenObjectLayout-1:has(> .icon-2) {
+        break-after: avoid-column !important;
+        -webkit-column-break-after: avoid !important;
+    }
+
+    ._idGenObjectLayout-1:has(> .icon-1) + p,
+    ._idGenObjectLayout-1:has(> .icon-2) + p,
+    ._idGenObjectLayout-1:has(> .icon-1) + h1,
+    ._idGenObjectLayout-1:has(> .icon-1) + h2,
+    ._idGenObjectLayout-1:has(> .icon-1) + h3,
+    ._idGenObjectLayout-1:has(> .icon-2) + h1,
+    ._idGenObjectLayout-1:has(> .icon-2) + h2,
+    ._idGenObjectLayout-1:has(> .icon-2) + h3 {
+        break-before: avoid-column !important;
+        -webkit-column-break-before: avoid !important;
+    }
+}
+
+@media print {
+
+    ._idGenObjectLayout-1:has(> .icon-1),
+    ._idGenObjectLayout-1:has(> .icon-2) {
+        break-after: avoid-page !important;
+        page-break-after: avoid !important;
+    }
+
+    ._idGenObjectLayout-1:has(> .icon-1) + p,
+    ._idGenObjectLayout-1:has(> .icon-2) + p,
+    ._idGenObjectLayout-1:has(> .icon-1) + h1,
+    ._idGenObjectLayout-1:has(> .icon-1) + h2,
+    ._idGenObjectLayout-1:has(> .icon-1) + h3,
+    ._idGenObjectLayout-1:has(> .icon-2) + h1,
+    ._idGenObjectLayout-1:has(> .icon-2) + h2,
+    ._idGenObjectLayout-1:has(> .icon-2) + h3 {
+        break-before: avoid-page !important;
+        page-break-before: avoid !important;
+    }
+}
+
+
+/* ==========================================================
+   5. ТОЧЕЧНО НЕРАЗРЫВНЫЕ АБЗАЦЫ
+   ========================================================== */
+
+@media screen {
+    p.Question,
+    p.Question2,
+    p.mainQuestion,
+    p.term_words {
+        break-inside: avoid-column !important;
+        -webkit-column-break-inside: avoid !important;
+    }
+}
+
+@media print {
+    p.Question,
+    p.Question2,
+    p.mainQuestion,
+    p.term_words {
+        break-inside: avoid-page !important;
+        page-break-inside: avoid !important;
+    }
+}
+
+/* ==========================================================
+   6. БЛОК КЛЮЧЕВЫХ ПОНЯТИЙ
+   ========================================================== */
+
+@media screen {
+    ._idGenObjectLayout-1:has(
+        > .OBJ_KeyTerms
+        > .OBJ_KeyTerms
+        > p.key
+    ),
+    ._idGenObjectLayout-1
+    > .OBJ_KeyTerms:has(
+        > .OBJ_KeyTerms
+        > p.key
+    ) {
+        break-inside: avoid-column !important;
+        -webkit-column-break-inside: avoid !important;
+    }
+}
+
+@media print {
+    ._idGenObjectLayout-1:has(
+        > .OBJ_KeyTerms
+        > .OBJ_KeyTerms
+        > p.key
+    ),
+    ._idGenObjectLayout-1
+    > .OBJ_KeyTerms:has(
+        > .OBJ_KeyTerms
+        > p.key
+    ) {
+        break-inside: avoid-page !important;
+        page-break-inside: avoid !important;
+    }
+}
+
+
+/* ==========================================================
+   7. ИЗОБРАЖЕНИЯ И ПОДПИСИ
+   ========================================================== */
+
+@media screen {
+    img,
+    figure,
+    svg {
+        break-inside: avoid-column !important;
+        -webkit-column-break-inside: avoid !important;
+    }
+
+}
+
+@media print {
+    img,
+    figure,
+    svg {
+        break-inside: avoid-page !important;
+        page-break-inside: avoid !important;
+    }
+
+}
+
+
+/* ==========================================================
+   8. ЗАЩИТА ОТ ОДИНОЧНЫХ СТРОК
+   ========================================================== */
+
+p {
+    widows: 2;
+    orphans: 2;
+}
+
+
+/* ==========================================================
+   9. РУЧНЫЕ СЛУЖЕБНЫЕ КЛАССЫ
+   ========================================================== */
+
+@media screen {
+
+    .page-break-before {
+        break-before: column !important;
+        -webkit-column-break-before: always !important;
+    }
+
+    .page-break-after {
+        break-after: column !important;
+        -webkit-column-break-after: always !important;
+    }
+
+    .keep-with-next {
+        break-after: avoid-column !important;
+        -webkit-column-break-after: avoid !important;
+    }
+}
+
+@media print {
+
+    .page-break-before {
+        break-before: page !important;
+        page-break-before: always !important;
+    }
+
+    .page-break-after {
+        break-after: page !important;
+        page-break-after: always !important;
+    }
+
+    .keep-with-next {
+        break-after: avoid-page !important;
+        page-break-after: avoid !important;
+    }
+}
+
+
+/* ==========================================================
+   10. ДИАГНОСТИКА ПОДКЛЮЧЕНИЯ
+   ========================================================== */
+
+/*
+   Для проверки подключения временно раскомментируйте:
+
+   p.Chapter1,
+   p.Paragraph,
+   div.Текстовый-фрейм:has(> p.Chapter1) {
+       outline: 4px solid red !important;
+       background: yellow !important;
+   }
+*/

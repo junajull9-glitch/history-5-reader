@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Поход Святослава на Волжскую Булгарию — интерактивная карта</title>
+  <link rel="stylesheet" href="styles.css?v=mobile4">
+</head>
+<body>
+  <main class="map-app" aria-label="Интерактивная карта похода Святослава">
+    <header class="map-toolbar">
+      <div>
+        <div class="eyebrow">Интерактивная карта</div>
+        <h1>Поход Святослава на Волжскую Булгарию</h1>
+      </div>
+      <div class="toolbar-actions" aria-label="Управление картой">
+        <button type="button" class="tool-button" data-action="zoom-out" aria-label="Уменьшить">−</button>
+        <span class="zoom-value" aria-live="polite">100%</span>
+        <button type="button" class="tool-button" data-action="zoom-in" aria-label="Увеличить">+</button>
+        <button type="button" class="tool-button tool-button--wide" data-action="reset-view">По размеру</button>
+      </div>
+    </header>
+
+    <section class="map-layout">
+      <div class="map-viewport" id="mapViewport">
+        <div class="map-stage" id="mapStage">
+          <img src="assets/p21-01.png" alt="Карта похода Святослава на Волжскую Булгарию" draggable="false">
+
+          <svg class="map-overlay" viewBox="0 0 539 370" role="img" aria-label="Интерактивные области и анимированный маршрут">
+            <defs>
+              <filter id="routeGlow" x="-80%" y="-80%" width="260%" height="260%">
+                <feGaussianBlur stdDeviation="3.4" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <radialGradient id="stageGlow">
+                <stop offset="0" stop-color="#ffe784" stop-opacity=".95"/>
+                <stop offset=".45" stop-color="#ffb321" stop-opacity=".5"/>
+                <stop offset="1" stop-color="#ffb321" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+
+            <g class="layer layer--cities" data-layer="cities">
+              <circle class="hotspot point point--kiev" cx="31" cy="333" r="5" data-id="kiev" tabindex="0" />
+              <circle class="hotspot point" cx="50" cy="282" r="5" data-id="chernigov" tabindex="0" />
+              <circle class="hotspot point" cx="54" cy="194" r="5" data-id="smolensk" tabindex="0" />
+              <circle class="hotspot point" cx="217" cy="89" r="5" data-id="rostov" tabindex="0" />
+              <circle class="hotspot point" cx="228" cy="110" r="5" data-id="suzdal" tabindex="0" />
+              <circle class="hotspot point" cx="225" cy="154" r="5" data-id="murom" tabindex="0" />
+              <circle class="hotspot point" cx="463" cy="191" r="5" data-id="bulgar" tabindex="0" />
+            </g>
+
+            <g class="layer layer--peoples" data-layer="peoples">
+              <rect class="hotspot nation-hotspot" x="172.41" y="162.96" width="66.10" height="15.75" rx="4.47" ry="4.49" data-id="muroma" tabindex="0" />
+              <rect class="hotspot nation-hotspot" x="242.21" y="67.59" width="66.10" height="15.75" rx="4.47" ry="4.49" data-id="merya" tabindex="0" />
+              <rect class="hotspot nation-hotspot" x="294.65" y="152.15" width="66.10" height="15.75" rx="4.47" ry="4.49" data-id="mordva" tabindex="0" />
+              <rect class="hotspot nation-hotspot" x="348.97" y="89.18" width="79.38" height="15.75" rx="5.37" ry="4.49" data-id="mari" tabindex="0" />
+              <path class="hotspot bulgaria-hotspot" d="M514.05,314.15 C500.13,346.63 476.27,347.64 442.93,318.66 C408.77,303.85 388.76,269.40 374.03,227.60 C364.42,194.61 362.54,160.89 367.89,126.41 C409.30,128.27 442.21,121.74 477.64,110.11 C508.97,116.77 526.96,157.78 522.46,230.41 C524.13,253.84 519.84,283.24 514.05,314.15 Z" data-id="bulgaria" tabindex="0" />
+            </g>
+
+            <!-- Единый маршрут, проложенный по направлению печатных стрелок. -->
+            <g class="animated-route" aria-hidden="true">
+              <path id="routePath" class="route-guide"
+                d="M43.05,333.27
+                   C118.38,259.68 204.98,232.80 283.30,144.95
+                   C357.12,116.43 424.01,149.86 461.98,188.80
+                   C480.82,222.53 430.78,196.69 434.51,355.77" />
+              <path id="routeTrail" class="route-trail"
+                d="M43.05,333.27
+                   C118.38,259.68 204.98,232.80 283.30,144.95
+                   C357.12,116.43 424.01,149.86 461.98,188.80
+                   C480.82,222.53 430.78,196.69 434.51,355.77" />
+              <g id="routeMarker" class="route-marker">
+                <circle id="routeMarkerHalo" class="route-marker__halo" cx="43.05" cy="333.27" r="9"/>
+                <path id="routeMarkerArrow" class="route-marker__arrow"
+                  d="M51.05,333.27 L36.05,328.27 L39.55,333.27 L36.05,338.27 Z"/>
+              </g>
+            </g>
+
+            <g class="stage-highlights" aria-hidden="true">
+              <circle class="stage-pulse" data-stage="0" cx="43.05" cy="333.27" r="28"/>
+              <ellipse class="stage-pulse" data-stage="1" cx="188" cy="216" rx="48" ry="30"/>
+              <ellipse class="stage-pulse" data-stage="2" cx="335" cy="137" rx="58" ry="35"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <aside class="info-panel" aria-live="polite">
+        <section class="route-controller">
+          <div class="route-kicker">965–967 годы</div>
+          <h2 id="routeTitle">Поход Святослава</h2>
+          <p id="routeText">Запустите маршрут: карта последовательно покажет движение от Киева через земли вятичей и мордвы к Волжской Булгарии.</p>
+
+          <div class="route-progress" aria-label="Ход маршрута">
+            <div class="route-progress__bar"><span id="routeProgressBar"></span></div>
+            <div class="route-progress__label" id="routeProgressLabel">Маршрут не запущен</div>
+          </div>
+
+          <div class="route-controls">
+            <button type="button" class="route-button route-button--primary" id="startRoute">▶ Старт</button>
+            <button type="button" class="route-button" id="pauseRoute" disabled>Ⅱ Пауза</button>
+            <button type="button" class="route-button" id="resetRoute">↺ Сброс</button>
+          </div>
+
+          <label class="speed-control">
+            <span>Скорость движения</span>
+            <input id="routeSpeed" type="range" min="0.6" max="2" step="0.1" value="1">
+          </label>
+
+          <ol class="stage-list" id="stageList">
+            <li data-stage-index="0"><b>Киев</b><span>Начало похода</span></li>
+            <li data-stage-index="1"><b>Земли вятичей</b><span>Продвижение на северо-восток</span></li>
+            <li data-stage-index="2"><b>Земли мордвы</b><span>Поворот к Волге</span></li>
+            <li data-stage-index="3"><b>Волжская Булгария</b><span>Конечная цель маршрута</span></li>
+          </ol>
+        </section>
+
+        <article class="info-card" id="infoCard" hidden>
+          <div class="info-card__kind" id="infoKind"></div>
+          <h2 id="infoTitle"></h2>
+          <p id="infoText"></p>
+          <button type="button" class="close-card" id="closeCard">Вернуться к маршруту</button>
+        </article>
+
+        <div class="layer-switcher" aria-label="Слои карты">
+          <button class="layer-button is-active" data-toggle-layer="cities">Города</button>
+          <button class="layer-button is-active" data-toggle-layer="peoples">Народы</button>
+          <button class="layer-button is-active" data-toggle-route>Маршрут</button>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="map-caption">Нажмите «Старт», чтобы увидеть последовательность похода. По городам и областям можно нажимать отдельно.</footer>
+  </main>
+
+  <script src="app.js?v=mobile4"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+/* ==========================================================
+   Настройки масштабирования текста
+   ========================================================== */
+
+:root {
+    --reader-font-scale: 1;
+    --box-heading-size: 24px;
+}
+
+
+/* ==========================================================
+   Привязанный текстовый контейнер
+   ========================================================== */
+
+.OBJ_HeadingBox {
+    display: flex !important;
+    align-items: center !important;
+
+    width: 100% !important;
+    min-height: 42px !important;
+
+    margin: 18px 0 10px !important;
+    padding: 8px 18px !important;
+
+    box-sizing: border-box !important;
+
+    background-color: #c86443 !important;
+
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+
+    overflow: visible !important;
+}
+
+
+/* ==========================================================
+   Текст заголовка
+   ========================================================== */
+
+.TXT_BoxHeading {
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    font-family: "Akrobat", sans-serif !important;
+    font-size: calc(
+        var(--box-heading-size) * var(--reader-font-scale)
+    ) !important;
+    font-weight: 700 !important;
+    font-style: normal !important;
+
+    line-height: 1.15 !important;
+
+    color: #ffffff !important;
+
+    text-align: left !important;
+    text-indent: 0 !important;
+    letter-spacing: 0 !important;
+
+    white-space: normal !important;
+    overflow-wrap: break-word;
+}
+
+
+/* ==========================================================
+   Сброс локальных переопределений InDesign
+   ========================================================== */
+
+.TXT_BoxHeading span {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-weight: inherit !important;
+    font-style: inherit !important;
+    line-height: inherit !important;
+    color: inherit !important;
+    letter-spacing: inherit !important;
+}
