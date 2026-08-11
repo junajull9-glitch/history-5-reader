@@ -978,3 +978,23 @@ body { position: relative; }
     max-height:none !important;
   }
 }
+
+/* ==========================================================
+   Mobile glossary typography — PT Serif
+   Keeps glossary stress marks/diacritics stable on iOS Safari.
+   Desktop glossary typography is unchanged.
+   ========================================================== */
+@media (max-width: 820px) {
+  .glossary-popup,
+  .glossary-popup * {
+    font-family: "PT Serif", Georgia, "Times New Roman", serif !important;
+    letter-spacing: normal !important;
+    font-kerning: normal !important;
+    font-synthesis: none !important;
+  }
+
+  .glossary-popup-title {
+    font-family: "PT Serif", Georgia, "Times New Roman", serif !important;
+  }
+}
+
