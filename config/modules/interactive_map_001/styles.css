@@ -1,0 +1,935 @@
+:root {
+  --paper: #fffdf7;
+  --ink: #1e2b25;
+  --muted: #6c766f;
+  --panel: #f2ead6;
+  --line: #b89d5e;
+  --accent: #b75b2e;
+  --accent-blue: #0aa1d8;
+  --shadow: 0 18px 60px rgba(0, 0, 0, .22);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: #152019;
+  color: var(--ink);
+  font-family: "PT Serif", Georgia, serif;
+}
+
+body { padding: 18px; }
+
+button { font: inherit; }
+
+.map-app {
+  width: min(1280px, 100%);
+  margin: 0 auto;
+  background: var(--paper);
+  border: 1px solid rgba(184, 157, 94, .65);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.map-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 22px;
+  background: linear-gradient(180deg, #142219, #0f1913);
+  color: #fff5da;
+  border-bottom: 2px solid #caa85a;
+}
+
+.eyebrow {
+  color: #d9b565;
+  font: 600 12px/1.1 "Open Sans", Arial, sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 3px 0 0;
+  font-size: clamp(20px, 2vw, 30px);
+  line-height: 1.1;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.tool-button,
+.layer-button,
+.close-card {
+  border: 1px solid #d5b66f;
+  background: rgba(255,255,255,.06);
+  color: inherit;
+  border-radius: 9px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.tool-button:hover,
+.tool-button:focus-visible,
+.layer-button:hover,
+.layer-button:focus-visible,
+.close-card:hover,
+.close-card:focus-visible {
+  outline: none;
+  background: rgba(213,182,111,.18);
+}
+
+.tool-button--wide { min-width: 112px; }
+.zoom-value { min-width: 54px; text-align: center; font-family: "Open Sans", Arial, sans-serif; }
+
+.map-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  min-height: 680px;
+}
+
+.map-viewport {
+  position: relative;
+  overflow: hidden;
+  min-height: 680px;
+  background:
+    linear-gradient(rgba(255,255,255,.28), rgba(255,255,255,.28)),
+    repeating-linear-gradient(0deg, rgba(118,101,58,.035) 0 1px, transparent 1px 5px),
+    #d9d0bc;
+  cursor: grab;
+  touch-action: none;
+}
+
+.map-viewport.is-dragging { cursor: grabbing; }
+
+.map-stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(94%, 940px);
+  transform-origin: center center;
+  will-change: transform;
+  user-select: none;
+}
+
+.map-stage img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #8d794a;
+  box-shadow: 0 8px 24px rgba(58, 47, 22, .25);
+}
+
+.map-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.hotspot {
+  fill: rgba(10, 161, 216, .12);
+  stroke: rgba(10, 161, 216, 0);
+  stroke-width: 3;
+  cursor: pointer;
+  transition: fill .18s ease, stroke .18s ease, filter .18s ease, opacity .18s ease;
+  pointer-events: all;
+}
+
+.hotspot:hover,
+.hotspot:focus,
+.hotspot.is-selected {
+  outline: none;
+  fill: rgba(10, 161, 216, .26);
+  stroke: #0aa1d8;
+  filter: drop-shadow(0 0 5px rgba(10, 161, 216, .75));
+}
+
+.route {
+  fill: none;
+  stroke: rgba(214, 107, 31, 0);
+  stroke-width: 18;
+  stroke-linecap: round;
+}
+
+.route:hover,
+.route:focus,
+.route.is-selected {
+  fill: none;
+  stroke: rgba(255, 172, 65, .55);
+}
+
+.layer.is-hidden { opacity: .08; pointer-events: none; }
+
+.info-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  background: var(--panel);
+  border-left: 1px solid rgba(184,157,94,.55);
+}
+
+.panel-intro,
+.info-card {
+  background: rgba(255,255,255,.56);
+  border: 1px solid rgba(184,157,94,.55);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.panel-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 10px;
+  border-radius: 50%;
+  background: #efc852;
+  font-size: 23px;
+}
+
+.info-panel h2 { margin: 0 0 10px; font-size: 24px; }
+.info-panel p { margin: 0; line-height: 1.5; }
+
+.info-card__kind {
+  color: var(--accent);
+  font: 700 12px/1.2 "Open Sans", Arial, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  margin-bottom: 8px;
+}
+
+.close-card {
+  margin-top: 18px;
+  color: var(--ink);
+  background: #fffaf0;
+}
+
+.layer-switcher {
+  margin-top: auto;
+  display: grid;
+  gap: 8px;
+}
+
+.layer-button {
+  color: var(--ink);
+  background: rgba(255,255,255,.55);
+  text-align: left;
+}
+
+.layer-button.is-active::before { content: "●"; color: var(--accent-blue); margin-right: 8px; }
+.layer-button:not(.is-active)::before { content: "○"; color: #8b8b8b; margin-right: 8px; }
+
+.map-caption {
+  padding: 11px 22px;
+  background: #f7dca0;
+  border-top: 1px solid #d8b35d;
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  body { padding: 0; }
+  .map-app { border-radius: 0; min-height: 100vh; }
+  .map-toolbar { align-items: flex-start; flex-direction: column; }
+  .map-layout { grid-template-columns: 1fr; }
+  .map-viewport { min-height: 62vh; }
+  .info-panel { border-left: 0; border-top: 1px solid rgba(184,157,94,.55); }
+  .layer-switcher { grid-template-columns: repeat(3, 1fr); }
+  .layer-button { text-align: center; }
+}
+
+@media (max-width: 560px) {
+  .toolbar-actions { flex-wrap: wrap; }
+  .tool-button--wide { min-width: 0; }
+  .info-panel { padding: 14px; }
+  .layer-switcher { grid-template-columns: 1fr; }
+}
+
+/* ==========================================================
+   Анимированный маршрут похода
+   ========================================================== */
+
+.animated-route {
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity .2s ease;
+}
+
+.animated-route.is-hidden {
+  opacity: 0;
+}
+
+.route-guide {
+  fill: none;
+  stroke: rgba(255, 248, 211, .7);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2 12;
+  opacity: .22;
+}
+
+.route-trail {
+  fill: none;
+  stroke: #b64f27;
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: url(#routeGlow);
+}
+
+.route-marker {
+  filter: url(#routeGlow);
+  pointer-events: none;
+}
+
+.route-marker__halo {
+  fill: rgba(255, 190, 45, .2);
+  stroke: rgba(255, 245, 180, .92);
+  stroke-width: 1.2;
+}
+
+.route-marker__arrow {
+  fill: #ffae24;
+  stroke: #8a341b;
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+
+.stage-pulse {
+  fill: url(#stageGlow);
+  stroke: #ffb321;
+  stroke-width: 2;
+  opacity: 0;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.stage-pulse.is-active {
+  opacity: 1;
+  animation: stagePulse 1.35s ease-in-out infinite;
+}
+
+@keyframes stagePulse {
+  0%, 100% { transform: scale(.88); opacity: .56; }
+  50% { transform: scale(1.14); opacity: 1; }
+}
+
+.route-controller {
+  background: rgba(255,255,255,.62);
+  border: 1px solid rgba(184,157,94,.55);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.route-kicker {
+  color: var(--accent);
+  font: 700 12px/1.2 "Open Sans", Arial, sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+.route-progress {
+  margin-top: 18px;
+}
+
+.route-progress__bar {
+  height: 7px;
+  border-radius: 99px;
+  overflow: hidden;
+  background: rgba(30,43,37,.12);
+}
+
+.route-progress__bar span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #b64f27, #efb236);
+  transition: width .08s linear;
+}
+
+.route-progress__label {
+  margin-top: 7px;
+  color: var(--muted);
+  font: 13px/1.25 "Open Sans", Arial, sans-serif;
+}
+
+.route-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 7px;
+  margin-top: 16px;
+}
+
+.route-button {
+  border: 1px solid rgba(184,157,94,.75);
+  border-radius: 9px;
+  padding: 9px 6px;
+  color: var(--ink);
+  background: #fffaf0;
+  cursor: pointer;
+  font: 600 13px/1.1 "Open Sans", Arial, sans-serif;
+}
+
+.route-button--primary {
+  background: #173d2b;
+  color: #fff;
+  border-color: #173d2b;
+}
+
+.route-button:disabled {
+  opacity: .42;
+  cursor: default;
+}
+
+.speed-control {
+  display: grid;
+  gap: 7px;
+  margin-top: 15px;
+  font: 600 13px/1.2 "Open Sans", Arial, sans-serif;
+}
+
+.speed-control input {
+  width: 100%;
+  accent-color: #173d2b;
+}
+
+.stage-list {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.stage-list li {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding: 9px 10px 9px 29px;
+  border-radius: 9px;
+  color: #48524d;
+  background: rgba(255,255,255,.35);
+  transition: background .2s ease, color .2s ease, transform .2s ease;
+}
+
+.stage-list li::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 14px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #b9ad91;
+}
+
+.stage-list li.is-active {
+  color: #163426;
+  background: #fff8df;
+  transform: translateX(3px);
+}
+
+.stage-list li.is-active::before {
+  background: #ffad22;
+  box-shadow: 0 0 0 5px rgba(255,173,34,.2);
+}
+
+.stage-list b { font: 700 14px/1.2 "Open Sans", Arial, sans-serif; }
+.stage-list span { font: 12px/1.3 "Open Sans", Arial, sans-serif; }
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-pulse.is-active { animation: none; }
+}
+
+/* Компактные пульсирующие маркеры городов: Киев золотой, остальные голубые. */
+.layer--cities .point {
+  fill: #0aa1d8 !important;
+  fill-opacity: .98 !important;
+  stroke: #ffffff !important;
+  stroke-width: 1.35 !important;
+  filter:
+    drop-shadow(0 0 1.5px rgba(255,255,255,.95))
+    drop-shadow(0 0 4px rgba(10,161,216,.9));
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cityPulseBlue 1.8s ease-in-out infinite;
+}
+
+.layer--cities .point--kiev {
+  fill: #ffb321 !important;
+  stroke: #fff8d2 !important;
+  filter:
+    drop-shadow(0 0 1.5px rgba(255,255,255,1))
+    drop-shadow(0 0 5px rgba(255,179,33,.95));
+  animation-name: cityPulseGold;
+}
+
+.layer--cities .point:nth-child(2) { animation-delay: -.25s; }
+.layer--cities .point:nth-child(3) { animation-delay: -.5s; }
+.layer--cities .point:nth-child(4) { animation-delay: -.75s; }
+.layer--cities .point:nth-child(5) { animation-delay: -1s; }
+.layer--cities .point:nth-child(6) { animation-delay: -1.25s; }
+.layer--cities .point:nth-child(7) { animation-delay: -1.5s; }
+
+@keyframes cityPulseBlue {
+  0%, 100% {
+    transform: scale(.86);
+    filter:
+      drop-shadow(0 0 1px rgba(255,255,255,.9))
+      drop-shadow(0 0 2.5px rgba(10,161,216,.65));
+  }
+  50% {
+    transform: scale(1.16);
+    filter:
+      drop-shadow(0 0 2px rgba(255,255,255,1))
+      drop-shadow(0 0 6px rgba(10,161,216,1));
+  }
+}
+
+@keyframes cityPulseGold {
+  0%, 100% {
+    transform: scale(.86);
+    filter:
+      drop-shadow(0 0 1px rgba(255,255,255,.95))
+      drop-shadow(0 0 3px rgba(255,179,33,.7));
+  }
+  50% {
+    transform: scale(1.18);
+    filter:
+      drop-shadow(0 0 2px rgba(255,255,255,1))
+      drop-shadow(0 0 7px rgba(255,179,33,1));
+  }
+}
+
+.layer--cities .point:hover,
+.layer--cities .point:focus,
+.layer--cities .point.is-selected {
+  stroke-width: 2 !important;
+  animation-play-state: paused;
+  transform: scale(1.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer--cities .point { animation: none; }
+}
+
+
+
+/* Точные интерактивные области народов из слоя Nation присланного SVG. */
+.layer--peoples .nation-hotspot {
+  fill: rgba(10, 161, 216, 0) !important;
+  stroke: rgba(10, 161, 216, 0) !important;
+  stroke-width: 1.2 !important;
+  filter: none !important;
+}
+
+.layer--peoples .nation-hotspot:hover,
+.layer--peoples .nation-hotspot:focus,
+.layer--peoples .nation-hotspot.is-selected {
+  fill: rgba(10, 161, 216, .11) !important;
+  stroke: rgba(10, 161, 216, .72) !important;
+  filter: drop-shadow(0 0 3px rgba(10, 161, 216, .55)) !important;
+}
+
+/* Булгария остаётся кликабельной, но без жёлтой или иной обводки. */
+.layer--peoples .bulgaria-hotspot,
+.layer--peoples .bulgaria-hotspot:hover,
+.layer--peoples .bulgaria-hotspot:focus,
+.layer--peoples .bulgaria-hotspot.is-selected {
+  fill: rgba(73, 116, 40, .035) !important;
+  stroke: transparent !important;
+  stroke-width: 0 !important;
+  filter: none !important;
+}
+
+/* ==========================================================
+   Автоподгонка модуля под размер окна
+   ========================================================== */
+html, body { width: 100%; height: 100%; min-height: 0; overflow: hidden; }
+body { padding: clamp(0px, 1.2vmin, 18px); }
+.map-app {
+  height: calc(100dvh - 2 * clamp(0px, 1.2vmin, 18px));
+  max-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+.map-toolbar { padding: clamp(8px, 1.4vh, 18px) clamp(10px, 1.5vw, 22px); }
+.map-layout { min-height: 0; height: 100%; grid-template-columns: minmax(0,1fr) clamp(250px, 25vw, 320px); }
+.map-viewport { min-height: 0; height: 100%; }
+.info-panel { min-height: 0; overflow: auto; padding: clamp(12px, 1.8vw, 24px); gap: clamp(10px, 1.5vh, 18px); }
+.panel-intro, .info-card { padding: clamp(12px, 1.5vw, 20px); }
+.map-caption { padding-block: 7px; }
+
+@media (max-width: 900px) {
+  .map-app { height: 100dvh; min-height: 0; }
+  .map-toolbar { flex-direction: row; align-items: center; }
+  .map-layout { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) minmax(170px, 36vh); }
+  .map-viewport { min-height: 0; }
+  .info-panel { border-left: 0; border-top: 1px solid rgba(184,157,94,.55); }
+}
+@media (max-width: 560px), (max-height: 620px) {
+  .map-toolbar { gap: 8px; padding: 7px 9px; }
+  .eyebrow { display: none; }
+  h1 { font-size: clamp(15px, 4vw, 20px); }
+  .toolbar-actions { gap: 4px; }
+  .tool-button { padding: 6px 8px; }
+  .tool-button--wide { display: none; }
+  .zoom-value { min-width: 42px; }
+  .map-layout { grid-template-rows: minmax(0, 1fr) minmax(145px, 34vh); }
+  .info-panel { padding: 9px; gap: 8px; }
+  .panel-intro { display: none; }
+  .info-card { padding: 10px; }
+  .info-panel h2 { font-size: 18px; margin-bottom: 6px; }
+  .info-panel p { font-size: 13px; line-height: 1.35; }
+  .layer-switcher { grid-template-columns: repeat(3,1fr); gap: 4px; }
+  .layer-button { padding: 6px 4px; font-size: 12px; text-align: center; }
+  .map-caption { display: none; }
+}
+
+/* Универсальное вписывание модуля в iframe читалки */
+html, body { width:100%; height:100%; min-height:0; overflow:hidden; }
+body { padding:0; }
+.map-app {
+  width:100%; height:100%; min-height:0; max-height:100%;
+  border-radius:0; display:grid; grid-template-rows:auto minmax(0,1fr) auto;
+}
+.map-toolbar { padding:clamp(8px,1.2vh,18px) clamp(12px,1.5vw,22px); }
+.map-layout {
+  min-height:0; height:100%;
+  grid-template-columns:minmax(0,1fr) clamp(250px,25vw,320px);
+}
+.map-viewport { min-height:0; height:100%; }
+.info-panel { min-height:0; overflow:auto; padding:clamp(12px,1.5vw,24px); gap:clamp(10px,1.4vh,18px); }
+.panel-intro,.info-card { padding:clamp(12px,1.3vw,20px); }
+.map-caption { padding:clamp(6px,.9vh,11px) 22px; }
+@media (max-height:760px) {
+  .map-toolbar { padding-block:7px; }
+  h1 { font-size:clamp(18px,2vw,26px); }
+  .info-panel { gap:9px; padding:10px 14px; }
+  .panel-intro,.info-card { padding:11px 13px; }
+  .info-panel h2 { font-size:20px; margin-bottom:6px; }
+  .info-panel p { line-height:1.3; }
+  .layer-switcher { gap:6px; }
+  .map-caption { display:none; }
+}
+
+/* ==========================================================
+   Единая автоподгонка всего интерактивного модуля
+   Эталонный холст 1280 x 800 масштабируется целиком.
+   ========================================================== */
+html, body {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden !important;
+  background: #152019;
+}
+body {
+  position: relative;
+  padding: 0 !important;
+}
+.map-app {
+  position: absolute !important;
+  left: 0;
+  top: 0;
+  width: 1280px !important;
+  height: 800px !important;
+  min-width: 1280px !important;
+  min-height: 800px !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  transform-origin: 0 0;
+  overflow: hidden !important;
+}
+.map-toolbar {
+  flex-direction: row !important;
+  align-items: center !important;
+  padding: 14px 20px !important;
+}
+.map-layout {
+  height: 100% !important;
+  min-height: 0 !important;
+  grid-template-columns: minmax(0, 1fr) 320px !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+}
+.map-viewport {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+.info-panel {
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  border-left: 1px solid rgba(184,157,94,.55) !important;
+  border-top: 0 !important;
+  padding: 18px !important;
+  gap: 12px !important;
+}
+.map-caption {
+  display: block !important;
+  padding: 8px 18px !important;
+}
+.layer-switcher {
+  grid-template-columns: 1fr !important;
+}
+
+
+/* ==========================================================
+   Адаптивный модуль: размеры вычисляются от области iframe,
+   без фиксированного эталонного холста и transform: scale().
+   ========================================================== */
+html, body {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+body { position: static !important; padding: 0 !important; }
+.map-app {
+  position: static !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  transform: none !important;
+  border-radius: 0 !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  overflow: hidden !important;
+}
+.map-toolbar {
+  min-height: 0 !important;
+  padding: clamp(7px, 1.15vh, 16px) clamp(10px, 1.35vw, 20px) !important;
+}
+.map-toolbar h1 { font-size: clamp(17px, 2.1vw, 29px) !important; }
+.map-layout {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  grid-template-columns: minmax(0, 76%) minmax(220px, 24%) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+}
+.map-viewport {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+.map-stage {
+  width: auto;
+  max-width: 94%;
+  max-height: 94%;
+}
+.info-panel {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  padding: clamp(8px, 1.25vw, 18px) !important;
+  gap: clamp(7px, 1.15vh, 14px) !important;
+}
+.panel-intro, .info-card, .route-controller { padding: clamp(9px, 1.1vw, 16px) !important; }
+.map-caption { padding: clamp(5px, .8vh, 9px) clamp(10px, 1.4vw, 20px) !important; }
+@media (max-aspect-ratio: 5/4) {
+  .map-layout { grid-template-columns: minmax(0, 70%) minmax(210px, 30%) !important; }
+}
+@media (max-width: 760px) {
+  .map-layout { grid-template-columns: minmax(0, 68%) minmax(190px, 32%) !important; }
+  .eyebrow, .map-caption, .panel-intro { display: none !important; }
+  .tool-button--wide { display: none !important; }
+  .info-panel { padding: 7px !important; gap: 6px !important; }
+  .route-controller, .info-card { padding: 8px !important; }
+}
+
+/* Модуль занимает всю область iframe внутри окна читалки. */
+html,body{width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;margin:0!important;overflow:hidden!important}
+.module-shell{width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;margin:0!important;border-radius:0!important;overflow:hidden!important}
+.map-layout{width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;grid-template-columns:minmax(0,76%) minmax(220px,24%)!important;grid-template-rows:minmax(0,1fr)!important}
+.map-viewport{width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;overflow:hidden!important}
+.map-stage{max-width:96%!important;max-height:96%!important}
+.info-panel{height:100%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important}
+@media(max-width:820px){.map-layout{grid-template-columns:minmax(0,70%) minmax(200px,30%)!important}}
+
+/* ==========================================================
+   Мобильная оболочка интерактивной карты
+   ========================================================== */
+@media (max-width: 700px), (max-height: 560px) {
+  html,body{width:100%;height:100%;height:100dvh;min-height:0;overflow:hidden}
+  body{padding:0!important}
+  .map-app{width:100%;height:100dvh;min-height:0;margin:0;border:0;border-radius:0;display:grid;grid-template-rows:auto minmax(0,1fr);box-shadow:none}
+  .map-toolbar{min-height:52px;padding:7px 48px 7px 10px;gap:6px;flex-direction:row;align-items:center}
+  .map-toolbar>div:first-child{min-width:0}.eyebrow{font-size:9px}h1{font-size:clamp(14px,4vw,19px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .toolbar-actions{gap:3px}.tool-button{padding:5px 8px;font-size:12px}.tool-button--wide{display:none}.zoom-value{min-width:38px;font-size:11px}
+  .map-layout{min-height:0;height:100%;grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;overflow:hidden}
+  .map-viewport{min-height:0;height:100%;touch-action:none}
+  .map-stage{width:min(98%,940px)}
+  .info-panel{position:relative;max-height:38dvh;min-height:120px;overflow:auto;padding:10px 12px;gap:8px;border-left:0;border-top:1px solid rgba(184,157,94,.55)}
+  .panel-intro{display:none}.info-card{padding:10px 12px;border-radius:10px}.info-panel h2{font-size:18px;margin-bottom:5px}.info-panel p{font-size:13px;line-height:1.3}.info-card__kind{font-size:9px;margin-bottom:4px}.close-card{margin-top:8px;padding:6px 9px;font-size:12px}
+  .layer-switcher{margin-top:0;display:flex;gap:5px;overflow-x:auto}.layer-button{flex:1 0 auto;padding:6px 8px;font-size:11px;text-align:center}
+  .map-caption{display:none}
+}
+@media (max-width: 700px) and (orientation: landscape){
+  .map-app{grid-template-rows:44px minmax(0,1fr)}.map-layout{grid-template-columns:minmax(0,1fr) min(34vw,280px);grid-template-rows:1fr}.info-panel{max-height:none;height:100%;min-height:0;border-top:0;border-left:1px solid rgba(184,157,94,.55)}
+}
+\n\n/* Mobile module v2 */\n@media (max-width:700px){\n  .map-app{height:100dvh!important;grid-template-rows:48px minmax(0,1fr)!important}\n  .map-toolbar{height:48px!important;min-height:48px!important;padding:5px 48px 5px 9px!important}\n  .map-toolbar h1{font-size:clamp(14px,4vw,18px)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}\n  .toolbar-actions{display:none!important}\n  .map-layout{grid-template-columns:1fr!important;grid-template-rows:minmax(0,62%) minmax(0,38%)!important}\n  .map-viewport{min-height:0!important}.map-stage{max-width:99%!important;max-height:99%!important}\n  .info-panel{height:100%!important;max-height:none!important;min-height:0!important;padding:8px 10px!important;overflow:auto!important;border-left:0!important;border-top:1px solid rgba(184,157,94,.55)!important}\n  .layer-switcher{display:none!important}.panel-intro{display:none!important}\n}\n@media (max-width:700px) and (orientation:landscape){\n  .map-app{grid-template-rows:44px minmax(0,1fr)!important}.map-layout{grid-template-columns:minmax(0,68%) minmax(0,32%)!important;grid-template-rows:1fr!important}.info-panel{border-top:0!important;border-left:1px solid rgba(184,157,94,.55)!important}\n}\n
+
+/* Mobile module v3: one-column portrait layout, no horizontal clipping. */
+@media (max-width:900px){
+  html,body,.map-app{width:100%!important;height:100dvh!important;min-width:0!important;min-height:0!important;overflow:hidden!important;touch-action:pan-y!important}
+  .map-app{display:grid!important;grid-template-rows:52px minmax(0,1fr)!important;border:0!important;border-radius:0!important}
+  .map-toolbar{height:52px!important;min-height:52px!important;padding:6px 52px 6px 10px!important}
+  .map-toolbar h1{font-size:clamp(15px,4.5vw,20px)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .eyebrow,.toolbar-actions,.map-caption{display:none!important}
+  .map-layout{display:grid!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;grid-template-columns:1fr!important;grid-template-rows:minmax(0,56%) minmax(0,44%)!important;overflow:hidden!important}
+  .map-viewport{width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;padding:4px!important;overflow:hidden!important}
+  .map-stage{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;transform-origin:center center!important}
+  .map-stage>svg,.map-stage>img{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important}
+  .info-panel{width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-height:none!important;padding:9px 11px!important;overflow-y:auto!important;overflow-x:hidden!important;border-left:0!important;border-top:1px solid rgba(184,157,94,.55)!important}
+  .panel-intro,.layer-switcher{display:none!important}.route-controller,.info-card{padding:10px!important}.stage-list{display:none!important}
+}
+@media (max-width:900px) and (orientation:landscape){
+  .map-app{grid-template-rows:46px minmax(0,1fr)!important}.map-toolbar{height:46px!important;min-height:46px!important}
+  .map-layout{grid-template-columns:minmax(0,66%) minmax(0,34%)!important;grid-template-rows:1fr!important}
+  .info-panel{border-top:0!important;border-left:1px solid rgba(184,157,94,.55)!important}
+}
+
+/* ==========================================================
+   Mobile shell v4 — compact map + readable bottom sheet.
+   Desktop rules above remain unchanged.
+   ========================================================== */
+@media (max-width: 900px) {
+  html, body {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    overscroll-behavior: none;
+    background: #152019 !important;
+  }
+  body { padding: 0 !important; }
+  .map-app {
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    display: grid !important;
+    grid-template-rows: 50px minmax(0, 1fr) !important;
+    overflow: hidden !important;
+  }
+  .map-toolbar {
+    height: 50px !important;
+    min-height: 50px !important;
+    padding: 6px max(52px, env(safe-area-inset-right)) 6px max(10px, env(safe-area-inset-left)) !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+  }
+  .map-toolbar > div:first-child { min-width: 0 !important; }
+  .map-toolbar h1 {
+    margin: 0 !important;
+    font: 700 clamp(15px, 4.4vw, 20px)/1.12 "Open Sans", Arial, sans-serif !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .eyebrow, .toolbar-actions, .map-caption { display: none !important; }
+  .map-layout {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: minmax(230px, 55%) minmax(0, 45%) !important;
+    overflow: hidden !important;
+  }
+  .map-viewport {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 4px !important;
+    overflow: hidden !important;
+    touch-action: none !important;
+  }
+  .map-stage {
+    max-width: 98% !important;
+    max-height: 98% !important;
+    transform-origin: center center !important;
+  }
+  .map-stage > img,
+  .map-stage > svg {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+  }
+  .info-panel {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 10px 12px calc(12px + env(safe-area-inset-bottom)) !important;
+    gap: 8px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border: 0 !important;
+    border-top: 1px solid rgba(184,157,94,.62) !important;
+    background: var(--panel) !important;
+  }
+  .panel-intro, .layer-switcher, .stage-list { display: none !important; }
+  .route-controller, .info-card {
+    padding: 10px 11px !important;
+    border-radius: 11px !important;
+  }
+  .route-kicker, .info-card__kind { font-size: 10px !important; }
+  .info-panel h2 { margin: 3px 0 6px !important; font-size: 18px !important; line-height: 1.15 !important; }
+  .info-panel p { margin: 0 !important; font-size: 13px !important; line-height: 1.35 !important; }
+  .route-controls { margin-top: 9px !important; gap: 5px !important; }
+  .route-button, .close-card { min-height: 36px !important; padding: 7px 9px !important; font-size: 12px !important; }
+  .speed-control { margin-top: 8px !important; font-size: 11px !important; }
+  .route-progress { margin-top: 8px !important; }
+}
+@media (max-width: 900px) and (orientation: landscape) {
+  .map-app { grid-template-rows: 44px minmax(0, 1fr) !important; }
+  .map-toolbar { height: 44px !important; min-height: 44px !important; }
+  .map-layout {
+    grid-template-columns: minmax(0, 66%) minmax(250px, 34%) !important;
+    grid-template-rows: 1fr !important;
+  }
+  .info-panel {
+    border-top: 0 !important;
+    border-left: 1px solid rgba(184,157,94,.62) !important;
+  }
+}

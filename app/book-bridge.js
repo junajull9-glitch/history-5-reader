@@ -38,6 +38,26 @@
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const cleanText = value => String(value || '').replace(/\s+/g, ' ').trim();
 
+
+  /*
+   * iOS Safari can report a layout viewport wider than the visible iframe
+   * when the exported InDesign HTML has no own viewport meta tag. Therefore
+   * mobile object layout must not depend only on CSS @media queries or
+   * window.innerWidth. The iframe's real rendered width in the shell is the
+   * reliable signal.
+   */
+  function readerRenderedWidth() {
+    const frameWidth = Number(window.frameElement?.getBoundingClientRect?.().width || 0);
+    if (frameWidth > 0) return frameWidth;
+    const visualWidth = Number(window.visualViewport?.width || 0);
+    if (visualWidth > 0) return visualWidth;
+    return Number(window.innerWidth || document.documentElement.clientWidth || 0);
+  }
+
+  function syncReaderMobileShellClass() {
+    document.documentElement.classList.toggle('reader-mobile-shell', readerRenderedWidth() <= 820);
+  }
+
   function injectStyles() {
     const style = document.createElement('style');
     style.id = 'reader-single-page-style';
@@ -72,6 +92,45 @@
       .reader-glossary-definition{margin:0;white-space:normal}
       .reader-glossary-close{position:absolute;top:5px;right:7px;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:transparent;color:#26352c;cursor:pointer;font:700 22px/28px Arial,sans-serif}
       .reader-glossary-close:hover,.reader-glossary-close:focus{background:#e6f4f9;outline:none}
+
+
+      /*
+       * OBJ_map mobile layout must be driven by the actual rendered iframe
+       * width rather than @media. This prevents iOS Safari from retaining
+       * InDesign's absolute geometry for some map exports.
+       */
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1:has(> .OBJ_map > .OBJ_map > p.TXT_Caption){
+        display:block!important;position:relative!important;inset:auto!important;transform:none!important;float:none!important;
+        width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+        margin:1em 0!important;padding:0!important;overflow:visible!important;box-sizing:border-box!important
+      }
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1 > .OBJ_map:has(> .OBJ_map > p.TXT_Caption){
+        display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:0!important;
+        position:relative!important;inset:auto!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+        transform:none!important;float:none!important;width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+        margin:0!important;padding:0!important;overflow:visible!important;background:transparent!important;border:0!important;box-sizing:border-box!important
+      }
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1 > .OBJ_map:has(> .OBJ_map > p.TXT_Caption) > :is(.OBJ_map,.image-center){
+        position:relative!important;inset:auto!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+        transform:none!important;float:none!important;height:auto!important;min-height:0!important;max-height:none!important;
+        margin:0!important;overflow:visible!important;border:0!important;box-sizing:border-box!important
+      }
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1 > .OBJ_map:has(> .OBJ_map > p.TXT_Caption) > :is(.OBJ_map,.image-center):has(> img){
+        order:1!important;z-index:2!important;display:block!important;width:100%!important;max-width:100%!important;padding:0!important;background:transparent!important
+      }
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1 > .OBJ_map:has(> .OBJ_map > p.TXT_Caption) > :is(.OBJ_map,.image-center):has(> img) > img{
+        display:block!important;position:static!important;width:100%!important;max-width:100%!important;height:auto!important;max-height:none!important;
+        margin:0 auto!important;padding:0!important;transform:none!important;object-fit:contain!important;border:0!important;box-sizing:border-box!important
+      }
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1 > .OBJ_map:has(> .OBJ_map > p.TXT_Caption) > .OBJ_map:has(> p.TXT_Caption){
+        order:2!important;z-index:1!important;display:block!important;position:relative!important;inset:auto!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+        transform:none!important;width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+        margin:0!important;padding:10px 12px 12px!important;background:#d9d9d9!important;overflow:visible!important;border:0!important;box-sizing:border-box!important
+      }
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1 > .OBJ_map:has(> .OBJ_map > p.TXT_Caption) > .OBJ_map:has(> p.TXT_Caption) > p.TXT_Caption{
+        display:block!important;position:static!important;width:100%!important;max-width:100%!important;height:auto!important;
+        margin:0!important;padding:0!important;transform:none!important;text-align:center!important;white-space:normal!important;overflow:visible!important;overflow-wrap:break-word!important;word-break:normal!important
+      }
 
       @media (max-width:820px){
         html,body{background:#f2eadc!important}
@@ -233,6 +292,7 @@
   }
 
   function prepareDocument() {
+    syncReaderMobileShellClass();
     injectStyles();
     const bodyChildren = [...document.body.childNodes].filter(node =>
       !(node.nodeType === Node.ELEMENT_NODE && node.tagName === 'SCRIPT')
@@ -1130,6 +1190,7 @@
   });
 
   addEventListener('resize', () => {
+    syncReaderMobileShellClass();
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => { paginate(true); buildToc(); }, 120);
   });
