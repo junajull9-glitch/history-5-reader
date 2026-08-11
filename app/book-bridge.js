@@ -36,7 +36,7 @@
 
   const post = (type, payload) => parent.postMessage({ source: 'reader-book', type, payload }, '*');
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-  const cleanText = value => String(value || '').replace(/\s+/g, ' ').trim();
+  const cleanText = value => String(value || '').normalize('NFC').replace(/\s+/g, ' ').trim();
 
 
   /*
@@ -86,10 +86,14 @@
       @media(max-width:820px){.reader-selection-toolbar{justify-content:center;padding:8px;border-radius:12px;isolation:isolate}.reader-selection-toolbar:after{content:'';position:absolute;left:50%;bottom:-8px;width:16px;height:16px;background:#26352c;transform:translateX(-50%) rotate(45deg);z-index:-1}.reader-selection-toolbar button{width:100%;min-height:44px;padding:10px 14px;font:600 16px 'Open Sans',Arial,sans-serif}}
       .reader-clickable-image{cursor:zoom-in}
       .term-word{cursor:help;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-thickness:1px;text-underline-offset:.14em}
-      .reader-glossary-popup{position:fixed;z-index:2147483640;display:block;width:min(390px,calc(100vw - 24px));max-height:min(55vh,430px);overflow:auto;padding:14px 16px 15px;border:2px solid #00a9e8;border-radius:10px;background:#fff8e8;color:#17130d;box-shadow:0 10px 30px #0006;box-sizing:border-box;font-family:"PT Serif",Georgia,serif;font-size:calc(16px * var(--reader-effective-font-scale,1));line-height:1.35}
+      @font-face{font-family:"Reader PT Serif";src:url("../fonts/PTSerif-Regular.ttf") format("truetype");font-style:normal;font-weight:400;font-display:swap}
+      @font-face{font-family:"Reader PT Serif";src:url("../fonts/PTSerif-Bold.ttf") format("truetype");font-style:normal;font-weight:700;font-display:swap}
+      @font-face{font-family:"Reader PT Serif";src:url("../fonts/PTSerif-Italic.ttf") format("truetype");font-style:italic;font-weight:400;font-display:swap}
+      @font-face{font-family:"Reader PT Serif";src:url("../fonts/PTSerif-BoldItalic.ttf") format("truetype");font-style:italic;font-weight:700;font-display:swap}
+      .reader-glossary-popup{position:fixed;z-index:2147483640;display:block;width:min(390px,calc(100vw - 24px));max-height:min(55vh,430px);overflow:auto;padding:14px 16px 15px;border:2px solid #00a9e8;border-radius:10px;background:#fff8e8;color:#17130d;box-shadow:0 10px 30px #0006;box-sizing:border-box;font-family:"Reader PT Serif","PT Serif",Georgia,serif!important;font-size:calc(16px * var(--reader-effective-font-scale,1));font-synthesis:none!important;font-kerning:normal!important;letter-spacing:normal!important;line-height:1.35}
       .reader-glossary-popup[hidden]{display:none!important}
-      .reader-glossary-title{margin:0 28px 7px 0;color:#c55f43;font-weight:700;font-style:italic;font-size:1.08em}
-      .reader-glossary-definition{margin:0;white-space:normal}
+      .reader-glossary-title{margin:0 28px 7px 0;color:#c55f43;font-family:"Reader PT Serif","PT Serif",Georgia,serif!important;font-weight:700!important;font-style:italic!important;font-size:1.08em;line-height:1.25!important;font-synthesis:none!important;letter-spacing:normal!important}
+      .reader-glossary-definition{margin:0;white-space:normal;font-family:"Reader PT Serif","PT Serif",Georgia,serif!important;font-style:normal!important;font-weight:400!important;line-height:1.35!important;font-synthesis:none!important;letter-spacing:normal!important}
       .reader-glossary-close{position:absolute;top:5px;right:7px;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:transparent;color:#26352c;cursor:pointer;font:700 22px/28px Arial,sans-serif}
       .reader-glossary-close:hover,.reader-glossary-close:focus{background:#e6f4f9;outline:none}
 

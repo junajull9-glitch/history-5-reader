@@ -36,7 +36,27 @@
 
   const post = (type, payload) => parent.postMessage({ source: 'reader-book', type, payload }, '*');
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-  const cleanText = value => String(value || '').replace(/\s+/g, ' ').trim();
+  const cleanText = value => String(value || '').normalize('NFC').replace(/\s+/g, ' ').trim();
+
+
+  /*
+   * iOS Safari can report a layout viewport wider than the visible iframe
+   * when the exported InDesign HTML has no own viewport meta tag. Therefore
+   * mobile object layout must not depend only on CSS @media queries or
+   * window.innerWidth. The iframe's real rendered width in the shell is the
+   * reliable signal.
+   */
+  function readerRenderedWidth() {
+    const frameWidth = Number(window.frameElement?.getBoundingClientRect?.().width || 0);
+    if (frameWidth > 0) return frameWidth;
+    const visualWidth = Number(window.visualViewport?.width || 0);
+    if (visualWidth > 0) return visualWidth;
+    return Number(window.innerWidth || document.documentElement.clientWidth || 0);
+  }
+
+  function syncReaderMobileShellClass() {
+    document.documentElement.classList.toggle('reader-mobile-shell', readerRenderedWidth() <= 820);
+  }
 
   function injectStyles() {
     const style = document.createElement('style');
@@ -66,12 +86,55 @@
       @media(max-width:820px){.reader-selection-toolbar{justify-content:center;padding:8px;border-radius:12px;isolation:isolate}.reader-selection-toolbar:after{content:'';position:absolute;left:50%;bottom:-8px;width:16px;height:16px;background:#26352c;transform:translateX(-50%) rotate(45deg);z-index:-1}.reader-selection-toolbar button{width:100%;min-height:44px;padding:10px 14px;font:600 16px 'Open Sans',Arial,sans-serif}}
       .reader-clickable-image{cursor:zoom-in}
       .term-word{cursor:help;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-thickness:1px;text-underline-offset:.14em}
-      .reader-glossary-popup{position:fixed;z-index:2147483640;display:block;width:min(390px,calc(100vw - 24px));max-height:min(55vh,430px);overflow:auto;padding:14px 16px 15px;border:2px solid #00a9e8;border-radius:10px;background:#fff8e8;color:#17130d;box-shadow:0 10px 30px #0006;box-sizing:border-box;font-family:"PT Serif",Georgia,serif;font-size:calc(16px * var(--reader-effective-font-scale,1));line-height:1.35}
+      @font-face{font-family:"Reader PT Serif";src:url("../fonts/PTSerif-Regular.ttf") format("truetype");font-style:normal;font-weight:400;font-display:swap}
+      @font-face{font-family:"Reader PT Serif";src:url("../fonts/PTSerif-Bold.ttf") format("truetype");font-style:normal;font-weight:700;font-display:swap}
+      @font-face{font-family:"Reader PT Serif";src:url("../fonts/PTSerif-Italic.ttf") format("truetype");font-style:italic;font-weight:400;font-display:swap}
+      @font-face{font-family:"Reader PT Serif";src:url("../fonts/PTSerif-BoldItalic.ttf") format("truetype");font-style:italic;font-weight:700;font-display:swap}
+      .reader-glossary-popup{position:fixed;z-index:2147483640;display:block;width:min(390px,calc(100vw - 24px));max-height:min(55vh,430px);overflow:auto;padding:14px 16px 15px;border:2px solid #00a9e8;border-radius:10px;background:#fff8e8;color:#17130d;box-shadow:0 10px 30px #0006;box-sizing:border-box;font-family:"Reader PT Serif","PT Serif",Georgia,serif!important;font-size:calc(16px * var(--reader-effective-font-scale,1));font-synthesis:none!important;font-kerning:normal!important;letter-spacing:normal!important;line-height:1.35}
       .reader-glossary-popup[hidden]{display:none!important}
-      .reader-glossary-title{margin:0 28px 7px 0;color:#c55f43;font-weight:700;font-style:italic;font-size:1.08em}
-      .reader-glossary-definition{margin:0;white-space:normal}
+      .reader-glossary-title{margin:0 28px 7px 0;color:#c55f43;font-family:"Reader PT Serif","PT Serif",Georgia,serif!important;font-weight:700!important;font-style:italic!important;font-size:1.08em;line-height:1.25!important;font-synthesis:none!important;letter-spacing:normal!important}
+      .reader-glossary-definition{margin:0;white-space:normal;font-family:"Reader PT Serif","PT Serif",Georgia,serif!important;font-style:normal!important;font-weight:400!important;line-height:1.35!important;font-synthesis:none!important;letter-spacing:normal!important}
       .reader-glossary-close{position:absolute;top:5px;right:7px;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:transparent;color:#26352c;cursor:pointer;font:700 22px/28px Arial,sans-serif}
       .reader-glossary-close:hover,.reader-glossary-close:focus{background:#e6f4f9;outline:none}
+
+
+      /*
+       * OBJ_map mobile layout must be driven by the actual rendered iframe
+       * width rather than @media. This prevents iOS Safari from retaining
+       * InDesign's absolute geometry for some map exports.
+       */
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1:has(> .OBJ_map > .OBJ_map > p.TXT_Caption){
+        display:block!important;position:relative!important;inset:auto!important;transform:none!important;float:none!important;
+        width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+        margin:1em 0!important;padding:0!important;overflow:visible!important;box-sizing:border-box!important
+      }
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1 > .OBJ_map:has(> .OBJ_map > p.TXT_Caption){
+        display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:0!important;
+        position:relative!important;inset:auto!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+        transform:none!important;float:none!important;width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+        margin:0!important;padding:0!important;overflow:visible!important;background:transparent!important;border:0!important;box-sizing:border-box!important
+      }
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1 > .OBJ_map:has(> .OBJ_map > p.TXT_Caption) > :is(.OBJ_map,.image-center){
+        position:relative!important;inset:auto!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+        transform:none!important;float:none!important;height:auto!important;min-height:0!important;max-height:none!important;
+        margin:0!important;overflow:visible!important;border:0!important;box-sizing:border-box!important
+      }
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1 > .OBJ_map:has(> .OBJ_map > p.TXT_Caption) > :is(.OBJ_map,.image-center):has(> img){
+        order:1!important;z-index:2!important;display:block!important;width:100%!important;max-width:100%!important;padding:0!important;background:transparent!important
+      }
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1 > .OBJ_map:has(> .OBJ_map > p.TXT_Caption) > :is(.OBJ_map,.image-center):has(> img) > img{
+        display:block!important;position:static!important;width:100%!important;max-width:100%!important;height:auto!important;max-height:none!important;
+        margin:0 auto!important;padding:0!important;transform:none!important;object-fit:contain!important;border:0!important;box-sizing:border-box!important
+      }
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1 > .OBJ_map:has(> .OBJ_map > p.TXT_Caption) > .OBJ_map:has(> p.TXT_Caption){
+        order:2!important;z-index:1!important;display:block!important;position:relative!important;inset:auto!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+        transform:none!important;width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+        margin:0!important;padding:10px 12px 12px!important;background:#d9d9d9!important;overflow:visible!important;border:0!important;box-sizing:border-box!important
+      }
+      html.reader-mobile-shell .reader-page-content ._idGenObjectLayout-1 > .OBJ_map:has(> .OBJ_map > p.TXT_Caption) > .OBJ_map:has(> p.TXT_Caption) > p.TXT_Caption{
+        display:block!important;position:static!important;width:100%!important;max-width:100%!important;height:auto!important;
+        margin:0!important;padding:0!important;transform:none!important;text-align:center!important;white-space:normal!important;overflow:visible!important;overflow-wrap:break-word!important;word-break:normal!important
+      }
 
       @media (max-width:820px){
         html,body{background:#f2eadc!important}
@@ -132,6 +195,9 @@
           text-align-last:auto!important;
           word-spacing:normal!important;
           letter-spacing:normal!important;
+          font-kerning:normal!important;
+          font-variant-ligatures:normal!important;
+          text-rendering:optimizeLegibility!important;
           -webkit-hyphens:auto!important;
           hyphens:auto!important;
           overflow-wrap:normal!important;
@@ -233,13 +299,18 @@
   }
 
   /*
-   * InDesign may export a combining acute accent (U+0301) into a separate
-   * span/text node. On iOS Safari with Open Sans this can visually split the
-   * word. Attach any leading combining marks to the previous text node before
-   * the document is cloned into reader pages.
+   * InDesign sometimes exports a combining acute accent (U+0301) into a
+   * separate span/text node, e.g. <span>Варна</span><span>́</span><span>ва</span>.
+   * With Open Sans + iOS Safari that standalone combining mark can acquire
+   * its own advance width and visually split the word.
+   *
+   * Before pagination, attach leading combining marks to the preceding text
+   * node in document order. This preserves the original element styling but
+   * makes the base letter + accent one grapheme for shaping/layout.
    */
   function normalizeDetachedCombiningMarks(root) {
     if (!root) return;
+
     const combiningAtStart = /^[\u0300-\u036f\u1ab0-\u1aff\u1dc0-\u1dff\u20d0-\u20ff\ufe20-\ufe2f]+/u;
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
       acceptNode(node) {
@@ -249,25 +320,37 @@
         return NodeFilter.FILTER_ACCEPT;
       }
     });
+
     const nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
+
     let previousText = null;
     const emptyParents = new Set();
+
     for (const node of nodes) {
-      const match = node.data.match(combiningAtStart);
+      let text = node.data;
+      const match = text.match(combiningAtStart);
+
       if (match && previousText) {
-        previousText.data += match[0];
-        node.data = node.data.slice(match[0].length);
-        if (!node.data && node.parentElement) emptyParents.add(node.parentElement);
+        const marks = match[0];
+        previousText.data += marks;
+        text = text.slice(marks.length);
+        node.data = text;
+        if (!text && node.parentElement) emptyParents.add(node.parentElement);
       }
+
       if (node.data.length) previousText = node;
     }
+
+    /* Remove only spans that became completely empty after moving the mark. */
     emptyParents.forEach(el => {
       if (el.tagName === 'SPAN' && !el.textContent && !el.querySelector('*')) el.remove();
     });
-    const nw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    while (nw.nextNode()) {
-      const node = nw.currentNode;
+
+    /* Normalize canonically without changing visible text. */
+    const normalizeWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (normalizeWalker.nextNode()) {
+      const node = normalizeWalker.currentNode;
       if (node.data && /[\u0300-\u036f\u1ab0-\u1aff\u1dc0-\u1dff\u20d0-\u20ff\ufe20-\ufe2f]/u.test(node.data)) {
         node.data = node.data.normalize('NFC');
       }
@@ -275,6 +358,7 @@
   }
 
   function prepareDocument() {
+    syncReaderMobileShellClass();
     injectStyles();
     normalizeDetachedCombiningMarks(document.body);
     const bodyChildren = [...document.body.childNodes].filter(node =>
@@ -1173,6 +1257,7 @@
   });
 
   addEventListener('resize', () => {
+    syncReaderMobileShellClass();
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => { paginate(true); buildToc(); }, 120);
   });
