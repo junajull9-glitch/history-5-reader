@@ -77,7 +77,7 @@
       .reader-page-sheet img{max-width:100%;height:auto}
       .reader-page-sheet table{max-width:100%}
       .Sys_PageBreak{display:none!important}
-      .reader-stressed-grapheme{display:inline-block!important;white-space:nowrap!important;letter-spacing:0!important;font-family:inherit!important;font-style:inherit!important;font-weight:inherit!important;line-height:inherit!important}\n      .reader-search-hit{background:#ffe56d!important;color:#111!important;border-radius:2px}
+      .reader-search-hit{background:#ffe56d!important;color:#111!important;border-radius:2px}
       .reader-search-hit.is-active{outline:2px solid #a34b18}
       .reader-note-highlight{display:inline;background-image:none!important;border-radius:2px;box-shadow:inset 0 -2px rgba(0,0,0,.12);color:inherit!important;cursor:pointer}
       .reader-selection-toolbar{position:fixed;z-index:2147483646;display:flex;gap:6px;padding:6px;border-radius:8px;background:#26352c;box-shadow:0 4px 16px #0005;pointer-events:auto}
@@ -191,6 +191,9 @@
           text-align-last:auto!important;
           word-spacing:normal!important;
           letter-spacing:normal!important;
+          font-kerning:normal!important;
+          font-variant-ligatures:normal!important;
+          text-rendering:optimizeLegibility!important;
           -webkit-hyphens:auto!important;
           hyphens:auto!important;
           overflow-wrap:normal!important;
@@ -292,66 +295,68 @@
   }
 
   /*
-   * Protect Unicode combining accents (especially U+0301, Russian stress)
-   * before pagination clones/splits the InDesign DOM. Safari + Open Sans can
-   * otherwise separate a combining mark from its base glyph after reflow.
+   * InDesign sometimes exports a combining acute accent (U+0301) into a
+   * separate span/text node, e.g. <span>Варна</span><span>́</span><span>ва</span>.
+   * With Open Sans + iOS Safari that standalone combining mark can acquire
+   * its own advance width and visually split the word.
+   *
+   * Before pagination, attach leading combining marks to the preceding text
+   * node in document order. This preserves the original element styling but
+   * makes the base letter + accent one grapheme for shaping/layout.
    */
-  function protectCombiningAccents(root) {
+  function normalizeDetachedCombiningMarks(root) {
     if (!root) return;
 
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const combiningAtStart = /^[\u0300-\u036f\u1ab0-\u1aff\u1dc0-\u1dff\u20d0-\u20ff\ufe20-\ufe2f]+/u;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        if (!node.data) return NodeFilter.FILTER_REJECT;
+        const parent = node.parentElement;
+        if (!parent || parent.closest('script,style,noscript,textarea')) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+
     const nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
 
-    // First repair exports where a combining mark starts a new text node/span.
-    for (let i = 0; i < nodes.length; i += 1) {
-      const node = nodes[i];
-      if (!node.parentNode || !node.nodeValue) continue;
-      const match = node.nodeValue.match(/^([\u0300-\u036f]+)/u);
-      if (!match) continue;
+    let previousText = null;
+    const emptyParents = new Set();
 
-      let prev = i - 1;
-      while (prev >= 0 && (!nodes[prev].parentNode || !nodes[prev].nodeValue)) prev -= 1;
-      if (prev < 0) continue;
+    for (const node of nodes) {
+      let text = node.data;
+      const match = text.match(combiningAtStart);
 
-      nodes[prev].nodeValue = (nodes[prev].nodeValue + match[1]).normalize('NFC');
-      node.nodeValue = node.nodeValue.slice(match[1].length);
+      if (match && previousText) {
+        const marks = match[0];
+        previousText.data += marks;
+        text = text.slice(marks.length);
+        node.data = text;
+        if (!text && node.parentElement) emptyParents.add(node.parentElement);
+      }
+
+      if (node.data.length) previousText = node;
     }
 
-    // Wrap each base-character + combining-mark grapheme so pagination,
-    // justification and WebKit font shaping must keep it as one inline unit.
-    const freshWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    const freshNodes = [];
-    while (freshWalker.nextNode()) freshNodes.push(freshWalker.currentNode);
-
-    const stressed = /([^\s\u0300-\u036f][\u0300-\u036f]+)/gu;
-    freshNodes.forEach(node => {
-      if (!node.parentNode || !node.nodeValue || !stressed.test(node.nodeValue)) {
-        stressed.lastIndex = 0;
-        return;
-      }
-      stressed.lastIndex = 0;
-      const frag = document.createDocumentFragment();
-      let last = 0;
-      let match;
-      while ((match = stressed.exec(node.nodeValue)) !== null) {
-        if (match.index > last) frag.appendChild(document.createTextNode(node.nodeValue.slice(last, match.index)));
-        const span = document.createElement('span');
-        span.className = 'reader-stressed-grapheme';
-        span.textContent = match[0].normalize('NFC');
-        frag.appendChild(span);
-        last = match.index + match[0].length;
-      }
-      if (last < node.nodeValue.length) frag.appendChild(document.createTextNode(node.nodeValue.slice(last)));
-      node.parentNode.replaceChild(frag, node);
-      stressed.lastIndex = 0;
+    /* Remove only spans that became completely empty after moving the mark. */
+    emptyParents.forEach(el => {
+      if (el.tagName === 'SPAN' && !el.textContent && !el.querySelector('*')) el.remove();
     });
+
+    /* Normalize canonically without changing visible text. */
+    const normalizeWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    while (normalizeWalker.nextNode()) {
+      const node = normalizeWalker.currentNode;
+      if (node.data && /[\u0300-\u036f\u1ab0-\u1aff\u1dc0-\u1dff\u20d0-\u20ff\ufe20-\ufe2f]/u.test(node.data)) {
+        node.data = node.data.normalize('NFC');
+      }
+    }
   }
 
   function prepareDocument() {
     syncReaderMobileShellClass();
     injectStyles();
-    protectCombiningAccents(document.body);
+    normalizeDetachedCombiningMarks(document.body);
     const bodyChildren = [...document.body.childNodes].filter(node =>
       !(node.nodeType === Node.ELEMENT_NODE && node.tagName === 'SCRIPT')
     );
