@@ -503,9 +503,41 @@
     return minimum < 0.48 ? 0 : average;
   }
 
+  function repairSplitTermWordCombiningMarks(root = flow) {
+    if (!root) return;
+
+    /*
+     * InDesign can export a stressed word as several adjacent .term-word
+     * spans and place U+0301 (combining acute accent) into its own span.
+     * iOS Safari then renders the accent as a separate glyph. Move only
+     * standalone combining marks into the preceding term span. This keeps
+     * the original InDesign formatting of the remaining word fragments.
+     */
+    root.querySelectorAll('.term-word').forEach(span => {
+      if (!span.isConnected) return;
+
+      const value = String(span.textContent || '');
+      if (!value || !/^[\u0300-\u036f]+$/.test(value)) return;
+
+      let previous = span.previousSibling;
+      while (previous?.nodeType === Node.TEXT_NODE && !cleanText(previous.data)) {
+        previous = previous.previousSibling;
+      }
+
+      if (
+        previous?.nodeType === Node.ELEMENT_NODE &&
+        previous.classList?.contains('term-word')
+      ) {
+        previous.textContent = String(previous.textContent || '') + value;
+        previous.normalize();
+        span.remove();
+      }
+    });
+  }
+
   function buildGlossaryEntries() {
     const entries = [];
-    flow.querySelectorAll('p.term_word, p.term_words').forEach(paragraph => {
+    flow.querySelectorAll('p.term_word').forEach(paragraph => {
       const text = cleanText(paragraph.textContent || '');
       const separator = text.search(/\s[—–-]\s/);
       if (separator < 1) return;
@@ -576,6 +608,7 @@
   }
 
   function setupGlossary() {
+    repairSplitTermWordCombiningMarks(flow);
     buildGlossaryEntries();
 
     glossaryPopup = document.createElement('aside');

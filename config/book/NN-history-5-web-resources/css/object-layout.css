@@ -760,7 +760,7 @@ div.OBJ_map {
     p.ResultHead,
     p.ParagraphQuestion,
     p.ChapterQuestion,
-    p.term_words
+    p.term_word
 ) {
     display: flow-root;
     width: auto;

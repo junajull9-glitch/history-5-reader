@@ -193,7 +193,7 @@
     p.Question,
     p.Question2,
     p.mainQuestion,
-    p.term_words {
+    p.term_word {
         break-inside: avoid-column !important;
         -webkit-column-break-inside: avoid !important;
     }
@@ -203,7 +203,7 @@
     p.Question,
     p.Question2,
     p.mainQuestion,
-    p.term_words {
+    p.term_word {
         break-inside: avoid-page !important;
         page-break-inside: avoid !important;
     }
