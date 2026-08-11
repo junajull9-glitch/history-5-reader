@@ -57,7 +57,7 @@
       .reader-page-sheet img{max-width:100%;height:auto}
       .reader-page-sheet table{max-width:100%}
       .Sys_PageBreak{display:none!important}
-      .reader-search-hit{background:#ffe56d!important;color:#111!important;border-radius:2px}
+      .reader-stressed-grapheme{display:inline-block!important;white-space:nowrap!important;letter-spacing:0!important;font-family:inherit!important;font-style:inherit!important;font-weight:inherit!important;line-height:inherit!important}\n      .reader-search-hit{background:#ffe56d!important;color:#111!important;border-radius:2px}
       .reader-search-hit.is-active{outline:2px solid #a34b18}
       .reader-note-highlight{display:inline;background-image:none!important;border-radius:2px;box-shadow:inset 0 -2px rgba(0,0,0,.12);color:inherit!important;cursor:pointer}
       .reader-selection-toolbar{position:fixed;z-index:2147483646;display:flex;gap:6px;padding:6px;border-radius:8px;background:#26352c;box-shadow:0 4px 16px #0005;pointer-events:auto}
@@ -229,6 +229,63 @@
         page.appendChild(footer);
       }
       return page;
+    });
+  }
+
+  /*
+   * Protect Unicode combining accents (especially U+0301, Russian stress)
+   * before pagination clones/splits the InDesign DOM. Safari + Open Sans can
+   * otherwise separate a combining mark from its base glyph after reflow.
+   */
+  function protectCombiningAccents(root) {
+    if (!root) return;
+
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+
+    // First repair exports where a combining mark starts a new text node/span.
+    for (let i = 0; i < nodes.length; i += 1) {
+      const node = nodes[i];
+      if (!node.parentNode || !node.nodeValue) continue;
+      const match = node.nodeValue.match(/^([\u0300-\u036f]+)/u);
+      if (!match) continue;
+
+      let prev = i - 1;
+      while (prev >= 0 && (!nodes[prev].parentNode || !nodes[prev].nodeValue)) prev -= 1;
+      if (prev < 0) continue;
+
+      nodes[prev].nodeValue = (nodes[prev].nodeValue + match[1]).normalize('NFC');
+      node.nodeValue = node.nodeValue.slice(match[1].length);
+    }
+
+    // Wrap each base-character + combining-mark grapheme so pagination,
+    // justification and WebKit font shaping must keep it as one inline unit.
+    const freshWalker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const freshNodes = [];
+    while (freshWalker.nextNode()) freshNodes.push(freshWalker.currentNode);
+
+    const stressed = /([^\s\u0300-\u036f][\u0300-\u036f]+)/gu;
+    freshNodes.forEach(node => {
+      if (!node.parentNode || !node.nodeValue || !stressed.test(node.nodeValue)) {
+        stressed.lastIndex = 0;
+        return;
+      }
+      stressed.lastIndex = 0;
+      const frag = document.createDocumentFragment();
+      let last = 0;
+      let match;
+      while ((match = stressed.exec(node.nodeValue)) !== null) {
+        if (match.index > last) frag.appendChild(document.createTextNode(node.nodeValue.slice(last, match.index)));
+        const span = document.createElement('span');
+        span.className = 'reader-stressed-grapheme';
+        span.textContent = match[0].normalize('NFC');
+        frag.appendChild(span);
+        last = match.index + match[0].length;
+      }
+      if (last < node.nodeValue.length) frag.appendChild(document.createTextNode(node.nodeValue.slice(last)));
+      node.parentNode.replaceChild(frag, node);
+      stressed.lastIndex = 0;
     });
   }
 
