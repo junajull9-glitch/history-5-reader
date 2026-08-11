@@ -114,6 +114,39 @@ body{position:static!important;padding:0!important}
 @media(max-width:760px){.main{grid-template-columns:minmax(0,68%) minmax(190px,32%)!important}.header small{display:none!important}.zoom button:last-child{display:none!important}.panel{padding:7px!important;gap:6px!important}.card{padding:8px!important}.battle-gallery{display:none!important}}
 </style>
 
+<style id="desktop-map-size-fix">
+/* Desktop only: make the map use the full available map pane.
+   Mobile layout below remains untouched. */
+@media (min-width: 761px) {
+  .main {
+    grid-template-columns: minmax(0, 1fr) clamp(280px, 24vw, 320px) !important;
+  }
+
+  .map-pane {
+    padding: 6px !important;
+  }
+
+  .stage {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+  }
+
+  .stage > svg {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+  }
+}
+</style>
+
 <style id="mobile-module-shell-clean">
 /* Mobile shell for interactive_map_002. Desktop rules above stay unchanged. */
 @media (max-width: 760px) {

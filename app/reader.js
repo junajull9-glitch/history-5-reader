@@ -30,7 +30,9 @@ const imageViewerZoomValue = $('#imageViewerZoomValue');
    ========================================================== */
 const INTERACTIVE_MODULES = Object.freeze({
   p22_1: 'modules/interactive_map_001/index.html',
-  p45_1: 'modules/interactive_map_002/index.html'
+  p45_1: 'modules/interactive_map_002/index.html',
+  p51_1: 'modules/interactive_map_003/index.html',
+  p66_1: 'modules/interactive_map_004/index.html'
 });
 
 function getImageFileKey(src) {
@@ -734,11 +736,19 @@ if (addBookmarkButton) {
   if (!workspace || !rightColumn || !bookmarksPanel || !notesPanel || !bookmarksToggle || !notesToggle) return;
 
   const desktopQuery = window.matchMedia('(min-width: 821px)');
+  const compactDesktopQuery = window.matchMedia('(min-width: 821px) and (max-width: 1100px)');
   const initiallyWide = window.matchMedia('(min-width: 1281px)').matches;
   let bookmarksOpen = initiallyWide;
   let notesOpen = initiallyWide;
+  let wasCompact = compactDesktopQuery.matches;
 
   function render(){
+    const compactNow = compactDesktopQuery.matches;
+    if (compactNow && !wasCompact) {
+      bookmarksOpen = false;
+      notesOpen = false;
+    }
+    wasCompact = compactNow;
     if (!desktopQuery.matches) {
       workspace.classList.remove('desktop-right-collapsed');
       rightColumn.classList.remove('desktop-bookmarks-closed','desktop-notes-closed','desktop-right-drawer');
@@ -781,44 +791,7 @@ if (addBookmarkButton) {
 
 
 
-/* ==========================================================
-   Desktop reader viewport height lock.
-   The height is recalculated only when the browser viewport itself
-   changes. Opening/closing TOC, bookmarks or notes therefore cannot
-   change the vertical size of the reading field.
-   ========================================================== */
-(function initDesktopWorkspaceHeightLock(){
-  const root = document.documentElement;
-  const shell = document.querySelector('.app-shell');
-  const topbar = document.querySelector('.topbar');
-  const bottombar = document.querySelector('.bottombar');
-  const desktopQuery = window.matchMedia('(min-width: 821px)');
-  let timer = 0;
-
-  function apply(){
-    if (!shell || !topbar || !bottombar) return;
-    if (!desktopQuery.matches) {
-      root.style.removeProperty('--desktop-workspace-height');
-      return;
-    }
-    const shellHeight = shell.clientHeight;
-    const topHeight = topbar.offsetHeight;
-    const bottomHeight = bottombar.offsetHeight;
-    const available = Math.max(0, Math.floor(shellHeight - topHeight - bottomHeight));
-    root.style.setProperty('--desktop-workspace-height', available + 'px');
-  }
-
-  function schedule(){
-    clearTimeout(timer);
-    timer = setTimeout(apply, 40);
-  }
-
-  requestAnimationFrame(apply);
-  window.addEventListener('resize', schedule, { passive:true });
-  document.addEventListener('fullscreenchange', () => setTimeout(apply, 30));
-  desktopQuery.addEventListener?.('change', apply);
-})();
-
+/* Desktop height is controlled by the app-shell CSS grid. */
 
 /* ==========================================================
    Desktop collapsible Table of Contents panel.
@@ -831,10 +804,15 @@ if (addBookmarkButton) {
   if (!workspace || !toc || !tocToggle) return;
 
   const desktopQuery = window.matchMedia('(min-width: 821px)');
+  const compactDesktopQuery = window.matchMedia('(min-width: 821px) and (max-width: 1100px)');
   const initiallyWide = window.matchMedia('(min-width: 1281px)').matches;
   let tocOpen = initiallyWide;
+  let wasCompact = compactDesktopQuery.matches;
 
   function render(){
+    const compactNow = compactDesktopQuery.matches;
+    if (compactNow && !wasCompact) tocOpen = false;
+    wasCompact = compactNow;
     if (!desktopQuery.matches) {
       workspace.classList.remove('desktop-toc-collapsed');
       toc.classList.remove('desktop-toc-drawer');
@@ -949,8 +927,12 @@ renderNotes();
   function applyReaderShellFit() {
     const viewportWidth = Math.max(320, window.innerWidth || REFERENCE_WIDTH);
     const viewportHeight = Math.max(240, window.innerHeight || REFERENCE_HEIGHT);
-    const fit = Math.min(viewportWidth / REFERENCE_WIDTH, viewportHeight / REFERENCE_HEIGHT, 1);
-    const scale = viewportWidth <= 820 ? 1 : Math.max(0.58, fit);
+    /* On desktop, fit by HEIGHT only. Narrowing the browser window must
+       activate the compact horizontal layout, not shrink the whole UI to
+       an unreadable miniature. The logical width therefore becomes narrower
+       naturally while the shell still fills the viewport vertically. */
+    const heightFit = Math.min(viewportHeight / REFERENCE_HEIGHT, 1);
+    const scale = viewportWidth <= 820 ? 1 : Math.max(0.68, heightFit);
     ROOT.style.setProperty('--reader-shell-scale', scale.toFixed(4));
     ROOT.dataset.readerShellScale = scale.toFixed(4);
   }

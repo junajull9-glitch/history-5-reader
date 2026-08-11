@@ -5,7 +5,53 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <title>История нашего края — электронный учебник</title>
   <link rel="stylesheet" href="fonts/fonts.css">
-  <link rel="stylesheet" href="app/styles/reader.css?v=desktop-toc-height-lock-4">
+  <link rel="stylesheet" href="app/styles/reader.css?v=desktop-resize-model-6">
+
+<style id="desktop-toc-compact-layout-fix">
+    @media (min-width: 821px) and (max-width: 1100px) {
+        #tocPanel {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            min-width: 0 !important;
+        }
+
+        #tocPanel > .panel-title {
+            flex: 0 0 auto !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            box-sizing: border-box !important;
+        }
+
+        #tocPanel > #tocList {
+            display: block !important;
+            flex: 1 1 auto !important;
+
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+
+            box-sizing: border-box !important;
+
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+
+            white-space: normal !important;
+        }
+
+        #tocPanel > #tocList * {
+            min-width: 0 !important;
+            max-width: 100% !important;
+
+            box-sizing: border-box !important;
+
+            white-space: normal !important;
+            overflow-wrap: break-word !important;
+            word-break: normal !important;
+        }
+    }
+</style>
+
 </head>
 <body>
 <div class="app-shell">
@@ -28,7 +74,7 @@
 
     <section class="reader-stage">
       <button class="page-arrow left" id="prevBtn" aria-label="Назад">‹</button>
-      <div class="book-frame"><iframe id="bookFrame" title="Учебник" src="book/NN-history-5.html?v=single-page-light-1"></iframe></div>
+      <div class="book-frame"><iframe id="bookFrame" title="Учебник" src="book/NN-history-5.html?v=single-page-light-4"></iframe></div>
       <button class="page-arrow right" id="nextBtn" aria-label="Вперёд">›</button>
     </section>
 
@@ -78,6 +124,6 @@
 <script src="config/reader-config.js"></script>
 <script src="app/services/storage.js"></script>
 <script src="app/bookmarks.js?v=mobile-notes-step4"></script>
-<script src="app/reader.js?v=desktop-toc-height-lock-4"></script>
+<script src="app/reader.js?v=desktop-resize-model-6"></script>
 </body>
 </html>

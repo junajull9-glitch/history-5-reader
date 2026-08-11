@@ -574,8 +574,14 @@
     const effectiveFontScale = pageFontRatio * cfg.baseFontRatio * fontZoom;
     if (mobile) pageZoom = 1;
     const visualPageWidth = Math.round(pageWidth * pageZoom);
+    const unzoomedPageHeight = Math.max(0, pageHeight / Math.max(pageZoom, 0.01));
+    const figure2MaxImageHeight = Math.max(1, Math.floor(unzoomedPageHeight * 0.30));
     flow.style.setProperty('--reader-effective-font-scale', String(effectiveFontScale));
     flow.style.setProperty('--reader-page-width', `${visualPageWidth}px`);
+    // Figure2 images are allowed to use at most 30% of the visible sheet
+    // height. Store the already-calculated unzoomed value as a CSS variable
+    // so object-layout.css does not have to depend on vh/browser chrome.
+    flow.style.setProperty('--reader-figure2-max-image-height', `${figure2MaxImageHeight}px`);
     flow.style.fontSize = `${effectiveFontScale * 100}%`;
     pages.forEach(page => {
       page.style.width = `${pageWidth}px`;
@@ -593,9 +599,22 @@
   function firstVisibleContentRect(content) {
     if (!content) return null;
 
-    // Measure the first actual printed character, not merely the top edge of
-    // its paragraph box. This keeps pages with different heading styles on
-    // the same visual top line while preserving each style's own typography.
+    let bestRect = null;
+    const consider = rect => {
+      if (!rect || (!rect.width && !rect.height)) return;
+      if (!bestRect || rect.top < bestRect.top) bestRect = rect;
+    };
+
+    /*
+     * DOM order is not necessarily visual order in exported InDesign objects.
+     * In OBJ_Figure_Left2/Right2 the caption may come before the image in the
+     * markup even though the image starts higher on the page. The old code
+     * stopped at the first text node and then pulled the whole page upward to
+     * that caption, clipping the top of the image.
+     *
+     * Measure both printed text and substantial visual objects and use the
+     * physically highest rectangle.
+     */
     const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, {
       acceptNode(node) {
         if (!node.data || !/\S/.test(node.data)) return NodeFilter.FILTER_REJECT;
@@ -614,22 +633,61 @@
       const range = document.createRange();
       range.setStart(node, index);
       range.setEnd(node, Math.min(node.data.length, index + 1));
-      const rect = range.getBoundingClientRect();
-      if (rect.width || rect.height) return rect;
+      consider(range.getBoundingClientRect());
     }
 
-    const visual = content.querySelector('img,svg,table,video,canvas,iframe,object,embed,hr');
-    if (visual) {
-      const rect = visual.getBoundingClientRect();
-      if (rect.width || rect.height) return rect;
-    }
-    return null;
+    content.querySelectorAll(
+      '._idGenObjectLayout-1:has(img,svg,video,canvas,iframe,object,embed),'+
+      '._idGenObjectLayout-2:has(img,svg,video,canvas,iframe,object,embed),'+
+      'img,svg,table,video,canvas,iframe,object,embed,hr'
+    ).forEach(element => {
+      const css = getComputedStyle(element);
+      if (css.display === 'none' || css.visibility === 'hidden') return;
+      consider(element.getBoundingClientRect());
+    });
+
+    return bestRect;
+  }
+
+  function pageStartVisualObject(content, firstRect) {
+    if (!content || !firstRect) return null;
+
+    let topVisual = null;
+    content.querySelectorAll(
+      '._idGenObjectLayout-1:has(img,svg,video,canvas,iframe,object,embed),'+
+      '._idGenObjectLayout-2:has(img,svg,video,canvas,iframe,object,embed)'
+    ).forEach(element => {
+      const css = getComputedStyle(element);
+      if (css.display === 'none' || css.visibility === 'hidden') return;
+      const rect = element.getBoundingClientRect();
+      if ((!rect.width && !rect.height) || rect.bottom <= rect.top) return;
+      if (!topVisual || rect.top < topVisual.rect.top) topVisual = { element, rect };
+    });
+
+    if (!topVisual) return null;
+
+    /*
+     * If the highest visual object begins at the same height as, or above, the
+     * first printable content, it is the page-start object. Return the actual
+     * element as well as detecting it: CSS can then use a smaller top gap only
+     * for this one object without changing Figure2 spacing elsewhere.
+     */
+    return topVisual.rect.top <= firstRect.top + Math.max(2, 2 * pageZoom)
+      ? topVisual.element
+      : null;
   }
 
   function normalizeActivePageTop() {
     const page = pages[pageIndex];
     const content = page?.querySelector('.reader-page-content');
     if (!page || !content) return;
+
+    // This marker is recalculated for every active page. It lets CSS reduce
+    // only the top gap of the object that actually begins the visible page.
+    pages.forEach(p => p.querySelectorAll('.reader-page-start-visual').forEach(el => {
+      el.classList.remove('reader-page-start-visual');
+    }));
+
     if (viewport && viewport.clientWidth <= 820) { content.style.marginTop = '0px'; return; }
 
     // Always measure from the uncorrected position so repeated navigation,
@@ -638,6 +696,15 @@
     const desiredTop = content.getBoundingClientRect().top;
     const firstRect = firstVisibleContentRect(content);
     if (!firstRect) return;
+
+    // A page that starts with a visual InDesign object must keep its natural
+    // spacing. Mark that specific object so Figure2 can use a smaller top gap
+    // without tightening the spacing of Figure2 instances inside the text.
+    const startVisual = pageStartVisualObject(content, firstRect);
+    if (startVisual) {
+      startVisual.classList.add('reader-page-start-visual');
+      return;
+    }
 
     // getBoundingClientRect() contains CSS zoom, while margin-top is assigned
     // in the page's unzoomed coordinate system.

@@ -1556,7 +1556,6 @@ img.QR {
 
     object-fit: contain !important;
     background: #fff !important;
-    border: 1px solid #666 !important;
     box-sizing: border-box !important;
 }
 
@@ -3125,7 +3124,6 @@ img.QR {
     object-fit: contain !important;
 
     background: #fff !important;
-    border: 1px solid #666 !important;
 
     box-sizing: border-box !important;
 }
@@ -4243,4 +4241,510 @@ table img {
     margin-right: 0 !important;
 
     box-sizing: border-box !important;
+}
+
+/* ==========================================================
+   OBJ_Figure_Left2 / OBJ_Figure_Right2
+   FINAL VISUAL OVERRIDE
+
+   Логика:
+   - исходную двухколоночную геометрию Left2/Right2 сохраняем;
+   - исходный верхний/нижний внешний интервал сохраняем;
+   - защиту от подъёма первого объекта выполняет book-bridge.js,
+     а не геометрия самого объектного стиля;
+   - серая плашка занимает центральные 85% высоты строки изображения;
+   - декоративная линия: 30%, #009ee3;
+   - старый круглый маркер скрыт;
+   - мобильная компоновка исходных Left2/Right2 сохраняется.
+   ========================================================== */
+
+:root {
+    --fig2-new-gray: #d9d9d9;
+    --fig2-new-accent: #009ee3;
+    --fig2-new-caption-pad: 16px;
+    --fig2-top-gap: 1.8em;
+    --fig2-page-start-gap: 0.85em;
+    --fig2-bottom-gap: 2em;
+}
+
+/* ----------------------------------------------------------
+   ВНЕШНЯЯ ОБЁРТКА
+
+   Геометрию внешней обёртки сохраняем естественной.
+   Если объект является первым визуальным элементом страницы,
+   book-bridge.js не выполняет выравнивание страницы по подписи.
+   ---------------------------------------------------------- */
+
+._idGenObjectLayout-1:has(
+    > .OBJ_Figure_Left2
+    > .OBJ_Figure_Left2
+    > p.TXT_Caption
+),
+._idGenObjectLayout-1:has(
+    > .OBJ_Figure_Right2
+    > .OBJ_Figure_Right2
+    > p.TXT_Caption
+) {
+    margin-top: var(--fig2-top-gap) !important;
+    margin-right: 0 !important;
+    margin-bottom: var(--fig2-bottom-gap) !important;
+    margin-left: 0 !important;
+
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+
+/* Если Figure2 реально начинает видимую страницу, используем более
+   компактный верхний интервал. Класс назначает book-bridge.js после
+   измерения фактических экранных координат объекта. */
+._idGenObjectLayout-1.reader-page-start-visual:has(
+    > .OBJ_Figure_Left2
+    > .OBJ_Figure_Left2
+    > p.TXT_Caption
+),
+._idGenObjectLayout-1.reader-page-start-visual:has(
+    > .OBJ_Figure_Right2
+    > .OBJ_Figure_Right2
+    > p.TXT_Caption
+) {
+    margin-top: var(--fig2-page-start-gap) !important;
+}
+
+/* Ограничение высоты изображения: не более 30% высоты видимой страницы.
+   Значение --reader-figure2-max-image-height вычисляет book-bridge.js по
+   реальной высоте листа, поэтому правило не зависит от высоты браузерного
+   viewport или панелей оболочки. Небольшие изображения не увеличиваются. */
+@media (min-width: 651px) {
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Left2:has(
+        > .OBJ_Figure_Left2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Left2:has(> img)
+    > img,
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Right2:has(
+        > .OBJ_Figure_Right2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Right2:has(> img)
+    > img {
+        width: auto !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: var(--reader-figure2-max-image-height, 30vh) !important;
+    }
+
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Left2:has(
+        > .OBJ_Figure_Left2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Left2:has(> img)
+    > img {
+        margin-left: 0 !important;
+        margin-right: auto !important;
+    }
+
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Right2:has(
+        > .OBJ_Figure_Right2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Right2:has(> img)
+    > img {
+        margin-left: auto !important;
+        margin-right: 0 !important;
+    }
+}
+
+/* ----------------------------------------------------------
+   ОБЩИЙ КОНТЕЙНЕР
+   Убираем старую серую полосу, нарисованную на всей сетке.
+   ---------------------------------------------------------- */
+
+._idGenObjectLayout-1
+> .OBJ_Figure_Left2:has(
+    > .OBJ_Figure_Left2
+    > p.TXT_Caption
+),
+._idGenObjectLayout-1
+> .OBJ_Figure_Right2:has(
+    > .OBJ_Figure_Right2
+    > p.TXT_Caption
+) {
+    background: transparent !important;
+}
+
+/* ----------------------------------------------------------
+   СТАРЫЙ КРУГЛЫЙ МАРКЕР
+   ---------------------------------------------------------- */
+
+._idGenObjectLayout-1
+> .OBJ_Figure_Left2:has(
+    > .OBJ_Figure_Left2
+    > p.TXT_Caption
+)::before,
+._idGenObjectLayout-1
+> .OBJ_Figure_Right2:has(
+    > .OBJ_Figure_Right2
+    > p.TXT_Caption
+)::before {
+    content: none !important;
+    display: none !important;
+}
+
+/* ----------------------------------------------------------
+   ПЛАШКА ПОДПИСИ
+
+   align-self: stretch растягивает фрейм подписи до высоты
+   grid-строки, определяемой изображением. Серый фон занимает
+   центральные 85% этой высоты: 7.5% + 85% + 7.5%.
+   ---------------------------------------------------------- */
+
+._idGenObjectLayout-1
+> .OBJ_Figure_Left2:has(
+    > .OBJ_Figure_Left2
+    > p.TXT_Caption
+)
+> .OBJ_Figure_Left2:has(> p.TXT_Caption),
+._idGenObjectLayout-1
+> .OBJ_Figure_Right2:has(
+    > .OBJ_Figure_Right2
+    > p.TXT_Caption
+)
+> .OBJ_Figure_Right2:has(> p.TXT_Caption) {
+    align-self: stretch !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+
+    margin-top: 0 !important;
+    min-height: 0 !important;
+
+    padding: var(--fig2-new-caption-pad) !important;
+
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 7.5%,
+        var(--fig2-new-gray) 7.5%,
+        var(--fig2-new-gray) 92.5%,
+        transparent 92.5%,
+        transparent 100%
+    ) !important;
+
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+
+/* ----------------------------------------------------------
+   ДЕКОРАТИВНАЯ ЛИНИЯ
+   ---------------------------------------------------------- */
+
+._idGenObjectLayout-1
+> .OBJ_Figure_Left2:has(
+    > .OBJ_Figure_Left2
+    > p.TXT_Caption
+)
+> .OBJ_Figure_Left2:has(> p.TXT_Caption)::before,
+._idGenObjectLayout-1
+> .OBJ_Figure_Right2:has(
+    > .OBJ_Figure_Right2
+    > p.TXT_Caption
+)
+> .OBJ_Figure_Right2:has(> p.TXT_Caption)::before {
+    content: "" !important;
+    display: block !important;
+    position: static !important;
+
+    width: 30% !important;
+    height: 3px !important;
+    min-height: 3px !important;
+    flex: 0 0 3px !important;
+
+    margin: 0 0 9px 0 !important;
+    padding: 0 !important;
+
+    background: var(--fig2-new-accent) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Right2: линия и подпись ориентированы вправо. */
+._idGenObjectLayout-1
+> .OBJ_Figure_Right2:has(
+    > .OBJ_Figure_Right2
+    > p.TXT_Caption
+)
+> .OBJ_Figure_Right2:has(> p.TXT_Caption)::before {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+}
+
+/* ----------------------------------------------------------
+   ТЕКСТ ПОДПИСИ
+   ---------------------------------------------------------- */
+
+._idGenObjectLayout-1
+> .OBJ_Figure_Left2:has(
+    > .OBJ_Figure_Left2
+    > p.TXT_Caption
+)
+> .OBJ_Figure_Left2:has(> p.TXT_Caption)
+> p.TXT_Caption,
+._idGenObjectLayout-1
+> .OBJ_Figure_Right2:has(
+    > .OBJ_Figure_Right2
+    > p.TXT_Caption
+)
+> .OBJ_Figure_Right2:has(> p.TXT_Caption)
+> p.TXT_Caption {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+
+    flex: 0 0 auto !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: transparent !important;
+    line-height: 1.22 !important;
+    text-indent: 0 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    overflow-wrap: break-word !important;
+    word-break: normal !important;
+    box-sizing: border-box !important;
+}
+
+._idGenObjectLayout-1
+> .OBJ_Figure_Left2:has(
+    > .OBJ_Figure_Left2
+    > p.TXT_Caption
+)
+> .OBJ_Figure_Left2:has(> p.TXT_Caption)
+> p.TXT_Caption {
+    text-align: left !important;
+}
+
+._idGenObjectLayout-1
+> .OBJ_Figure_Right2:has(
+    > .OBJ_Figure_Right2
+    > p.TXT_Caption
+)
+> .OBJ_Figure_Right2:has(> p.TXT_Caption)
+> p.TXT_Caption {
+    text-align: right !important;
+}
+
+/* ==========================================================
+   MOBILE
+
+   Исходный порядок элементов задаётся основными правилами:
+   Left2  -> изображение сверху, подпись снизу;
+   Right2 -> подпись сверху, изображение снизу.
+
+   Здесь меняем только визуальное оформление.
+   ========================================================== */
+
+@media (max-width: 650px) {
+
+    ._idGenObjectLayout-1:has(
+        > .OBJ_Figure_Left2
+        > .OBJ_Figure_Left2
+        > p.TXT_Caption
+    ),
+    ._idGenObjectLayout-1:has(
+        > .OBJ_Figure_Right2
+        > .OBJ_Figure_Right2
+        > p.TXT_Caption
+    ) {
+        /* На мобильном уже действует собственный поток страницы. */
+        margin-top: 1em !important;
+        margin-bottom: 1em !important;
+        padding-top: 0 !important;
+    }
+
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Left2:has(
+        > .OBJ_Figure_Left2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Left2:has(> p.TXT_Caption),
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Right2:has(
+        > .OBJ_Figure_Right2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Right2:has(> p.TXT_Caption) {
+        align-self: auto !important;
+        display: block !important;
+
+        min-height: 0 !important;
+        margin-top: 0 !important;
+        padding: 12px 14px 14px !important;
+
+        background: var(--fig2-new-gray) !important;
+    }
+
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Left2:has(
+        > .OBJ_Figure_Left2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Left2:has(> p.TXT_Caption)::before,
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Right2:has(
+        > .OBJ_Figure_Right2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Right2:has(> p.TXT_Caption)::before {
+        width: 30% !important;
+        margin: 0 auto 8px auto !important;
+    }
+
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Left2:has(
+        > .OBJ_Figure_Left2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Left2:has(> p.TXT_Caption)
+    > p.TXT_Caption,
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Right2:has(
+        > .OBJ_Figure_Right2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Right2:has(> p.TXT_Caption)
+    > p.TXT_Caption {
+        text-align: center !important;
+    }
+}
+
+
+/* ==========================================================
+   FIGURE2 DESKTOP — DYNAMIC IMAGE/CAPTION BOUNDARY
+
+   Для OBJ_Figure_Left2 / OBJ_Figure_Right2 ширина колонки
+   изображения определяется фактической шириной картинки после
+   ограничения max-height. Серая плашка занимает всё оставшееся
+   текстовое поле вплоть до реальной границы изображения.
+   ========================================================== */
+@media (min-width: 651px) {
+    /* Left2: фактическая ширина картинки + всё оставшееся место подписи. */
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Left2:has(
+        > .OBJ_Figure_Left2
+        > p.TXT_Caption
+    ) {
+        grid-template-columns: max-content minmax(0, 1fr) !important;
+        column-gap: 0 !important;
+        align-items: stretch !important;
+    }
+
+    /* Right2: всё оставшееся место подписи + фактическая ширина картинки. */
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Right2:has(
+        > .OBJ_Figure_Right2
+        > p.TXT_Caption
+    ) {
+        grid-template-columns: minmax(0, 1fr) max-content !important;
+        column-gap: 0 !important;
+        align-items: stretch !important;
+    }
+
+    /* Фрейм изображения должен сжиматься до фактической ширины img,
+       а не сохранять старые 50/56% текстового поля. */
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Left2:has(
+        > .OBJ_Figure_Left2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Left2:has(> img),
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Right2:has(
+        > .OBJ_Figure_Right2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Right2:has(> img) {
+        width: max-content !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        align-self: end !important;
+        padding: 0 !important;
+        background: transparent !important;
+    }
+
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Left2:has(
+        > .OBJ_Figure_Left2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Left2:has(> img) {
+        justify-self: start !important;
+    }
+
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Right2:has(
+        > .OBJ_Figure_Right2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Right2:has(> img) {
+        justify-self: end !important;
+    }
+
+    /* Сама картинка сохраняет пропорции и ограничение 30% высоты листа.
+       Никакой зарезервированной ширины вокруг узкой картинки не остаётся. */
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Left2:has(
+        > .OBJ_Figure_Left2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Left2:has(> img)
+    > img,
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Right2:has(
+        > .OBJ_Figure_Right2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Right2:has(> img)
+    > img {
+        display: block !important;
+        width: auto !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: var(--reader-figure2-max-image-height, 30vh) !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        object-fit: contain !important;
+    }
+
+    /* Плашка заполняет колонку до самой фактической границы картинки. */
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Left2:has(
+        > .OBJ_Figure_Left2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Left2:has(> p.TXT_Caption),
+    ._idGenObjectLayout-1
+    > .OBJ_Figure_Right2:has(
+        > .OBJ_Figure_Right2
+        > p.TXT_Caption
+    )
+    > .OBJ_Figure_Right2:has(> p.TXT_Caption) {
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        align-self: stretch !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+    }
 }

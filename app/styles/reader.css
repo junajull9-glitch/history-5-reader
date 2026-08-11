@@ -896,3 +896,85 @@ body { position: relative; }
     max-height:100% !important;
   }
 }
+
+/* ==========================================================
+   Compact desktop window (821-1100 px).
+   When the browser window is narrowed, side panels must never
+   squeeze the reader. They open only as overlays over a full-width
+   reader stage. Mobile shell <=820px is intentionally untouched.
+   ========================================================== */
+@media (min-width:821px) and (max-width:1100px){
+  .workspace,
+  .workspace.desktop-right-collapsed,
+  .workspace.desktop-toc-collapsed,
+  .workspace.desktop-toc-collapsed.desktop-right-collapsed{
+    grid-template-columns:minmax(0,1fr)!important;
+    position:relative!important;
+  }
+
+  .reader-stage{
+    grid-column:1!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+
+  /* TOC is a left overlay only while explicitly opened. */
+  #tocPanel.desktop-toc-drawer{
+    position:absolute!important;
+    z-index:51!important;
+    top:8px!important;
+    bottom:8px!important;
+    left:8px!important;
+    width:min(340px,42%)!important;
+    min-width:250px!important;
+    height:auto!important;
+    max-height:none!important;
+    display:flex!important;
+  }
+  .workspace.desktop-toc-collapsed #tocPanel{
+    display:none!important;
+  }
+
+  /* Bookmarks / notes are right overlays only while opened. */
+  .right-column.desktop-right-drawer{
+    position:absolute!important;
+    z-index:50!important;
+    top:8px!important;
+    bottom:8px!important;
+    right:8px!important;
+    width:min(340px,42%)!important;
+    min-width:250px!important;
+    height:auto!important;
+    max-height:none!important;
+  }
+  .workspace.desktop-right-collapsed .right-column.desktop-right-drawer{
+    display:none!important;
+  }
+}
+
+/* ==========================================================
+   Desktop resize model v6.
+   The desktop shell always occupies the full browser viewport.
+   Window narrowing changes only the horizontal layout; the middle
+   row always consumes all height between header and footer.
+   ========================================================== */
+@media (min-width:821px){
+  .app-shell{
+    grid-template-rows:max-content minmax(0,1fr) max-content !important;
+  }
+  .workspace{
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    align-self:stretch !important;
+    overflow:hidden !important;
+  }
+  .reader-stage,
+  .book-frame,
+  .book-frame iframe,
+  #tocPanel,
+  .right-column{
+    min-height:0 !important;
+    max-height:none !important;
+  }
+}
