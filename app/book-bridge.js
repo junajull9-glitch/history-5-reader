@@ -384,6 +384,41 @@
     // content to bleed through around the centered sheet.
     document.body.replaceChildren(viewport);
 
+    // Registered interactive OBJ_map modules get a delegated click target on the
+    // whole InDesign map group. This is more reliable on mobile Safari than
+    // relying only on the IMG click after mobile reflow/pagination.
+    flow.querySelectorAll('.OBJ_map').forEach(mapNode => {
+      const group = mapNode.parentElement;
+      if (!group || group.dataset.readerInteractiveBound === '1') return;
+      const img = group.querySelector('.OBJ_map img');
+      if (!img) return;
+
+      const originalSrc = img.getAttribute('src') || '';
+      const cleanName = originalSrc.split('#')[0].split('?')[0].split('/').pop()?.split('\\').pop() || '';
+      const stem = cleanName.replace(/\.[^.]+$/, '').trim().toLowerCase();
+      const numbered = stem.match(/^p0*(\d+)[_ -]+0*(\d+)$/i);
+      const imageKey = numbered
+        ? `p${Number(numbered[1])}_${Number(numbered[2])}`
+        : stem.replace(/[\s-]+/g, '_');
+      if (!['p22_1','p45_1','p51_1','p66_1','p68_1','p79_1','p118_1'].includes(imageKey)) return;
+
+      group.dataset.readerInteractiveBound = '1';
+      group.classList.add('reader-interactive-map-anchor');
+      group.addEventListener('click', event => {
+        if (event.target.closest('a,button,input,textarea,select')) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const currentSrc = img.currentSrc || img.src || originalSrc;
+        post('openImageViewer', {
+          src: currentSrc, currentSrc, originalSrc, imageKey,
+          isInteractiveMap: true, objectStyle: 'OBJ_map',
+          alt: img.alt || '', caption: imageCaption(img),
+          sourceWidth: img.getBoundingClientRect().width,
+          sourceHeight: img.getBoundingClientRect().height
+        });
+      }, true);
+    });
+
     flow.querySelectorAll('img').forEach(img => {
       /*
        * Служебные и декоративные иконки не должны открываться
