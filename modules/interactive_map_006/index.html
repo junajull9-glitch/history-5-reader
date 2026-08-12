@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Битва на реке Пьяне — 1377</title>
+<style>
+:root{--ink:#241b16;--paper:#e8dfb9;--panel:#fff9e8;--gold:#d8a328;--purple:#6d3b7d;--orange:#b36024;--blue:#2d638c;--green:#3b7851}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:#171b17;color:var(--ink);font-family:Georgia,"Times New Roman",serif}
+.shell{height:100dvh;display:grid;grid-template-rows:58px 1fr;background:var(--paper);overflow:hidden}
+.header{display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#2a231d;color:#fff6df;border-bottom:1px solid #9c8048}
+.header b{font-size:18px}.header span{font:12px Arial,sans-serif;color:#d9c79a}
+.main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 330px}
+.map-pane{position:relative;overflow:hidden;background:#e2d8ad;min-width:0}
+.viewport{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none}
+.stage{position:relative;width:min(96%,1120px);aspect-ratio:1417/970;transform-origin:center center;will-change:transform}
+.stage>img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none}
+.overlay{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.route{fill:none!important;stroke-width:4!important;stroke-linecap:round;stroke-dasharray:12 10;vector-effect:non-scaling-stroke;opacity:.82;animation:dash 1.15s linear infinite}
+.r-orda{stroke:var(--purple)!important}.r-murom{stroke:var(--orange)!important}.r-nnov{stroke:var(--blue)!important}.r-gold{stroke:var(--green)!important}
+.route.focus{stroke-width:6!important;opacity:1;filter:drop-shadow(0 0 3px rgba(255,230,160,.8))}
+@keyframes dash{to{stroke-dashoffset:-22}}
+.battle-exact{pointer-events:none}
+.battle-shape{fill:#990000!important;stroke:none!important}
+50%{filter:drop-shadow(0 0 12px rgba(216,163,40,.95))}}
+
+.battle-click{cursor:pointer}
+.battle-hit{fill:transparent;stroke:none;pointer-events:all}
+.battle-halo{fill:none;stroke:#d8a328;stroke-width:3;vector-effect:non-scaling-stroke;transform-box:fill-box;transform-origin:center;animation:battleHalo 1.55s ease-out infinite;pointer-events:none}
+@keyframes battleHalo{0%{transform:scale(.72);opacity:.95}82%,100%{transform:scale(2.15);opacity:0}}
+.controls{position:absolute;left:14px;top:14px;z-index:8;display:flex;gap:7px;flex-wrap:wrap}
+.chip{border:1px solid rgba(73,55,38,.4);background:rgba(50,39,31,.92);color:#fff;border-radius:18px;padding:8px 11px;font:13px Arial,sans-serif;cursor:pointer}
+.chip.active{box-shadow:0 0 0 2px #d6a32a inset}
+.legend{position:absolute;left:14px;bottom:14px;z-index:7;background:rgba(255,249,232,.93);border:1px solid #cbbb89;border-radius:8px;padding:8px 10px;font:11px Arial,sans-serif}
+.zoom{position:absolute;right:14px;bottom:14px;display:flex;gap:7px;z-index:7}
+.zoom button{width:38px;height:38px;border-radius:9px;border:1px solid #cfbf8d;background:#fff9e8;font-weight:700;cursor:pointer}
+.panel{min-height:0;overflow:auto;background:var(--panel);border-left:1px solid #cdbd8d;padding:18px}
+.eyebrow{font:700 11px Arial,sans-serif;letter-spacing:.15em;text-transform:uppercase;color:#a76f14}
+.panel h2{font-size:27px;margin:6px 0 4px}.period{font-style:italic;color:#755d44;margin-bottom:13px}
+.hero{width:100%;aspect-ratio:16/9;object-fit:cover;border:1px solid #d4c598;border-radius:8px;background:#e9dfbd;display:none}
+.caption{font:11px/1.35 Arial,sans-serif;color:#75654e;margin:6px 0 14px;display:none}
+.body{font-size:16px;line-height:1.47}.source{display:none;margin-top:13px;color:#8a5d19;font:12px Arial,sans-serif}
+.battle-button{width:100%;margin-top:15px;border:0;border-radius:8px;padding:11px;background:#8b2e2a;color:white;font:700 14px Arial,sans-serif;cursor:pointer;display:none}
+.story-overlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:30;display:none;width:min(82%,920px);max-height:82%;grid-template-columns:minmax(300px,42%) minmax(0,1fr);gap:20px;background:rgba(255,249,232,.99);border:1px solid #bda66b;border-radius:12px;padding:24px 20px 20px;box-shadow:0 16px 44px rgba(39,29,18,.38);overflow:auto}
+.story-overlay.open{display:grid}.story-overlay img{width:100%;height:auto;max-height:420px;object-fit:cover;border-radius:8px;border:1px solid #cab98b;align-self:start}
+.story-copy{min-width:0;padding-right:4px}.story-copy h3{margin:4px 38px 10px 0;font-size:25px;line-height:1.12}.story-copy p{margin:0;font-size:16px;line-height:1.5}
+.story-nav{display:flex;align-items:center;justify-content:space-between;margin-top:20px;gap:10px}.story-nav button{border:0;border-radius:7px;padding:9px 13px;background:#46362c;color:#fff;cursor:pointer}.story-count{font:13px Arial,sans-serif;color:#806c50}
+.close-story{position:absolute;right:12px;top:12px;width:32px;height:32px;border:0;border-radius:50%;background:#3c3028;color:white;cursor:pointer;font-size:18px}
+@media(max-width:760px){
+ .shell{grid-template-rows:50px 1fr}.header{padding:0 10px}.header b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.header span{display:none}
+ .main{grid-template-columns:1fr;grid-template-rows:56% 44%}.panel{border-left:0;border-top:1px solid #cdbd8d;padding:14px}.stage{width:99%}.controls{left:8px;top:8px;gap:5px}.chip{font-size:11px;padding:7px 8px}.zoom{display:none}.legend{left:8px;bottom:8px;font-size:9px}
+ .story-overlay{width:94%;max-height:90%;grid-template-columns:1fr;gap:10px;padding:12px}.story-overlay img{max-height:190px}.story-copy h3{font-size:19px;margin-right:34px}.story-copy p{font-size:13px;line-height:1.4}.story-nav{margin-top:10px}.story-nav button{padding:7px 9px}
+}
+@media(max-width:760px) and (orientation:landscape){.main{grid-template-columns:66% 34%;grid-template-rows:1fr}.panel{border-left:1px solid #cdbd8d;border-top:0}}
+@media(prefers-reduced-motion:reduce){.route,.battle-halo{animation:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="header"><b>Битва на реке Пьяне — 2 августа 1377 года</b><span>интерактивная историческая реконструкция</span></header>
+<div class="main">
+<section class="map-pane" id="mapPane">
+ <div class="controls">
+   <button class="chip route-btn" data-route="orda">В Мамаеву Орду</button>
+   <button class="chip route-btn" data-route="murom">В Муром</button>
+   <button class="chip route-btn" data-route="nnov">В Нижний Новгород</button>
+   <button class="chip route-btn" data-route="gold">В Золотую Орду</button>
+ </div>
+ <div class="viewport" id="viewport"><div class="stage" id="stage">
+  <img src="assets/map.png" alt="Карта района битвы на реке Пьяне">
+  <svg class="overlay" viewBox="0 0 1417 970" aria-label="Интерактивные маршруты и место битвы">
+   <g id="routes"><g id="route-orda" transform="matrix(0.076388140162 0 0 0.076377952756 -93.269919137466 -466.822047244095)"><metadata id="CorelCorpID_1Corel-Layer"/>
+  <path class="route r-orda" d="M1180 16765c887,-381 952,-2243 888,-4335"/></g><g id="route-murom" transform="matrix(0.076388140162 0 0 0.076377952756 -93.269919137466 -466.822047244095)"><metadata id="CorelCorpID_2Corel-Layer"/>
+  <path class="route r-murom" d="M1251 13318c445,-555 899,-1127 1581,-1492 1467,-209 3121,450 5081,-124 1007,-545 1836,-1570 2754,-2310"/></g><g id="route-nnov" transform="matrix(0.076388140162 0 0 0.076377952756 -93.269919137466 -466.822047244095)"><metadata id="CorelCorpID_3Corel-Layer"/>
+  <path class="route r-nnov" d="M2974 6319c582,709 1308,1418 2126,2126 1923,150 3711,589 5638,965"/></g><g id="route-gold" transform="matrix(0.076388140162 0 0 0.076377952756 -93.269919137466 -466.822047244095)"><metadata id="CorelCorpID_4Corel-Layer"/>
+  <path class="route r-gold" d="M10739 9384c811,112 2858,1811 4286,2717 330,-659 1770,-453 2787,-918 -460,1429 -26,2455 230,3987 120,756 -19,1222 -392,1719 -157,540 -204,1087 -32,1650"/></g></g>
+   <g id="battleClick" class="battle-click"><circle class="battle-hit" cx="711" cy="247" r="56"/><circle class="battle-halo" cx="711" cy="247" r="29"/><g id="battleExact" class="battle-exact" transform="matrix(0.076388140162 0 0 0.076377952756 -93.269919137466 -466.822047244095)"><metadata id="CorelCorpID_5Corel-Layer"/>
+  <path class="battle-shape" d="M10717 9643c4,-7 10,-20 14,-28 47,-94 34,-81 130,-129 8,-4 21,-10 28,-14 -15,-19 -35,-39 -51,-57 -17,-20 -34,-39 -51,-58l-98 -109c-2,-3 -4,-4 -6,-7l-59 -65c-3,-3 -4,-5 -6,-8l-33 -36c-22,-26 -50,-54 -71,-79 -14,-17 -40,-43 -51,-58l-46 -50c-14,-17 -36,-40 -52,-58l-33 -36c-4,-5 -8,-9 -12,-15 -5,-5 -9,-9 -13,-14 -4,-5 -9,-10 -13,-15 -9,-10 -18,-21 -29,-26 -26,-10 -56,-18 -83,-27 -27,-9 -55,-18 -82,-28l-124 -41c-40,-13 -59,14 -48,45l41 123c18,55 36,110 55,165 5,14 13,20 25,30l116 104c5,4 10,8 15,12l174 156c5,4 9,8 14,13l58 52c26,25 73,62 102,90l29 26c17,14 69,62 87,78l73 64zm-505 -171c29,18 86,37 111,60 22,21 47,89 62,111l43 -38c5,-4 10,-9 15,-13l58 -53 -24 -21c-9,-8 -16,-14 -25,-22 -29,-27 -69,-60 -97,-87l-49 -43c-4,5 -6,8 -11,13 -12,12 -47,54 -59,66l-24 27zm870 235c-16,13 -131,131 -132,133l141 103c4,3 7,5 11,8 3,2 6,4 9,7 0,1 -6,68 56,97 43,20 89,6 114,-19 25,-26 38,-73 17,-115 -9,-17 -22,-31 -38,-40 -22,-13 -33,-12 -61,-13 -11,-14 -20,-27 -30,-41l-87 -120zm-1179 161c-27,0 -42,1 -62,13 -16,10 -29,23 -37,40 -43,85 45,174 130,134 63,-29 56,-96 56,-97 5,-5 14,-10 20,-15l141 -103c0,-2 -116,-121 -132,-133 -13,16 -43,60 -58,80 -17,23 -42,60 -58,81zm1272 -354c7,-21 -8,-33 -17,-42 -36,-37 -38,-41 -78,-21 -14,6 -27,13 -41,20 -67,34 -141,69 -206,103 -9,5 -11,7 -16,16l-113 226c-22,43 -34,53 -3,84 8,8 22,24 32,29 20,11 35,-1 44,-10l340 -340c12,-12 54,-51 58,-65zm-1250 -4c2,15 18,28 26,35 11,11 20,21 31,31l340 340c34,35 51,12 76,-14 8,-8 23,-19 20,-40 -1,-10 -33,-70 -40,-83l-82 -165c-21,-43 -13,-33 -65,-59l-206 -103c-42,-21 -43,-20 -79,18 -9,8 -24,19 -21,40zm671 -465l102 114c2,2 3,4 5,6l83 93c5,5 9,9 13,15 9,-5 23,-21 32,-28l126 -112c3,-3 6,-5 8,-7l103 -91c9,-10 20,-50 25,-65l75 -225c5,-16 13,-31 4,-47 -16,-31 -52,-11 -85,0l-224 74c-15,6 -33,10 -41,19l-49 55c-18,22 -46,50 -64,72 -12,15 -45,48 -57,62 -11,14 -26,29 -35,40l-21 25z"/></g></g>
+  </svg>
+ </div></div>
+ <div class="story-overlay" id="story">
+   <button class="close-story" id="closeStory">×</button>
+   <img id="storyImg" src="assets/stage_1.jpg" alt="Реконструкция этапа битвы">
+   <div class="story-copy">
+     <div class="eyebrow">Ход битвы</div>
+     <h3 id="storyTitle"></h3>
+     <p id="storyText"></p>
+     <div class="story-nav"><button id="prevStage">‹ Назад</button><span class="story-count" id="storyCount"></span><button id="nextStage">Далее ›</button></div>
+   </div>
+ </div>
+ <div class="legend"><b style="color:#78498c">движущийся пунктир</b> — отдельные направления · пульсирующий бордовый знак — место битвы</div>
+ <div class="zoom"><button id="minus">−</button><button id="reset">1:1</button><button id="plus">+</button></div>
+</section>
+<aside class="panel">
+ <div class="eyebrow" id="eye">Интерактивная карта</div>
+ <h2 id="title">Битва на реке Пьяне</h2>
+ <div class="period" id="period">2 августа 1377 года</div>
+ <img class="hero" id="hero" src="assets/battle_reconstruction.jpg" alt="Реконструкция битвы на реке Пьяне">
+ <div class="caption" id="caption">Художественная реконструкция события.</div>
+ <div class="body" id="body">Нажмите на пульсирующий знак битвы на карте. Маршруты можно выбирать отдельно — каждый соответствует своему направлению.</div>
+ <a class="source" id="source" href="https://bigenc.ru/c/bitva-na-p-iane-1377-fa7eb3" target="_blank" rel="noopener">Источник ↗</a>
+ <button class="battle-button" id="battleStory">Ход битвы</button>
+</aside>
+</div></div>
+<script>
+const routeInfo={
+ orda:["Путь в Мамаеву Орду","Юго-западное направление","Маршрут показывает направление к владениям Мамаевой Орды. В 1377 году силы Араб-шаха, действовавшие в ордынском политическом пространстве, внезапно атаковали русское войско у Пьяны."],
+ murom:["Путь в Муром","Западное направление","Муромская рать входила в число сил, направленных на помощь Нижегородскому княжеству. На карте этот путь выделен как самостоятельное западное направление."],
+ nnov:["Путь в Нижний Новгород","Северо-западное направление","После разгрома русской рати ордынцы стремительно двинулись к Нижнему Новгороду. 5 августа они вошли в город и разоряли его несколько дней."],
+ gold:["Путь в Золотую Орду","Восточное направление","Отдельный маршрут к Золотой Орде показывает восточное направление сухопутных связей региона и помещает район Пьяны в более широкую систему дорог XIV века."]
+};
+document.querySelectorAll(".route-btn").forEach(btn=>btn.addEventListener("click",()=>{
+ const key=btn.dataset.route;
+ document.querySelectorAll(".route").forEach(x=>x.classList.remove("focus"));
+ document.getElementById("route-"+key).querySelectorAll(".route").forEach(x=>x.classList.add("focus"));
+ document.querySelectorAll(".route-btn").forEach(x=>x.classList.toggle("active",x===btn));
+ const d=routeInfo[key];
+ eye.textContent="Маршрут";title.textContent=d[0];period.textContent=d[1];hero.style.display="none";caption.style.display="none";body.textContent=d[2];source.style.display="none";battleStory.style.display="none";
+}));
+
+const eye=document.getElementById("eye"),title=document.getElementById("title"),period=document.getElementById("period"),hero=document.getElementById("hero"),caption=document.getElementById("caption"),body=document.getElementById("body"),source=document.getElementById("source"),battleStory=document.getElementById("battleStory");
+function showBattle(){
+ eye.textContent="Событие";title.textContent="Битва на реке Пьяне";period.textContent="2 августа 1377 года";
+ hero.style.display="block";caption.style.display="block";body.textContent="Русские полки достигли района реки Пары, правого притока Пьяны. Ордынцы, разделившись на несколько полков, внезапно ударили по неготовому к бою войску. Началось беспорядочное отступление к Пьяне; многие воины погибли и утонули, среди них князь Иван Дмитриевич.";
+ source.style.display="inline-block";battleStory.style.display="block";
+}
+document.getElementById("battleClick").addEventListener("click",showBattle);
+
+const STEPS=[
+ {title:"Сбор русских сил",text:"Летом 1377 года нижегородский князь Дмитрий Константинович, узнав о приближении Араб-шаха, обратился за помощью к Дмитрию Ивановичу. К нижегородской рати присоединились московские воеводы, а также силы из других русских земель.",img:"assets/stage_1.jpg",routes:["nnov","murom"]},
+ {title:"Ожидание у Пьяны",text:"Русское войско вышло в район Пьяны. Получив известие, будто противник находится далеко, ратники потеряли бдительность: оружие и доспехи не держали наготове, часть князей и бояр занималась охотой.",img:"assets/stage_2.jpg",routes:[]},
+ {title:"Внезапный удар",text:"2 августа силы Араб-шаха внезапно атаковали русское войско. Удар пришёлся по неготовым к организованному бою полкам, и быстро началось беспорядочное отступление.",img:"assets/stage_3.jpg",routes:["orda"]},
+ {title:"Бегство через Пьяну",text:"Отступающие русские воины оказались прижаты к реке. Многие бросились в воду и утонули. Среди погибших был князь Иван Дмитриевич.",img:"assets/stage_4.jpg",routes:[]},
+ {title:"Поход на Нижний Новгород",text:"После победы ордынцы стремительно двинулись к столице княжества. 5 августа они вошли в Нижний Новгород, грабили и жгли город, а затем разоряли окрестные земли.",img:"assets/stage_5.jpg",routes:["nnov"]}
+];
+let step=0;
+function focusRoutes(keys){
+ document.querySelectorAll(".route").forEach(r=>{r.classList.remove("focus");r.style.opacity=keys.length?".22":".82"});
+ keys.forEach(k=>document.getElementById("route-"+k).querySelectorAll(".route").forEach(r=>{r.classList.add("focus");r.style.opacity="1"}));
+}
+function renderStep(){
+ const s=STEPS[step];storyImg.src=s.img;storyTitle.textContent=s.title;storyText.textContent=s.text;storyCount.textContent=`${step+1} / ${STEPS.length}`;
+prevStage.style.visibility = step === 0 ? "hidden" : "visible";
+nextStage.style.visibility = step === STEPS.length - 1 ? "hidden" : "visible";
+focusRoutes(s.routes);
+}
+const story=document.getElementById("story"),storyImg=document.getElementById("storyImg"),storyTitle=document.getElementById("storyTitle"),storyText=document.getElementById("storyText"),storyCount=document.getElementById("storyCount");
+function startStory(){story.classList.add("open");step=0;renderStep();}
+function stopStory(){story.classList.remove("open");document.querySelectorAll(".route").forEach(r=>{r.classList.remove("focus");r.style.opacity=".82"});}
+battleStory.addEventListener("click",startStory);closeStory.addEventListener("click",stopStory);
+nextStage.addEventListener("click",()=>{step=Math.min(STEPS.length-1,step+1);renderStep()});
+prevStage.addEventListener("click",()=>{step=Math.max(0,step-1);renderStep()});
+
+let scale=1,txp=0,typ=0,drag=false,sx0=0,sy0=0;const stage=document.getElementById("stage"),vp=document.getElementById("viewport");
+function apply(){stage.style.transform=`translate(${txp}px,${typ}px) scale(${scale})`}
+plus.onclick=()=>{scale=Math.min(2.3,scale+.2);apply()};minus.onclick=()=>{scale=Math.max(.8,scale-.2);apply()};reset.onclick=()=>{scale=1;txp=typ=0;apply()};
+vp.addEventListener("pointerdown",e=>{if(e.target.closest(".battle-click"))return;drag=true;sx0=e.clientX-txp;sy0=e.clientY-typ;vp.setPointerCapture(e.pointerId)});
+vp.addEventListener("pointermove",e=>{if(!drag)return;txp=e.clientX-sx0;typ=e.clientY-sy0;apply()});vp.addEventListener("pointerup",()=>drag=false);
+</script>
+</body></html>

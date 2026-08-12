@@ -32,7 +32,10 @@ const INTERACTIVE_MODULES = Object.freeze({
   p22_1: 'modules/interactive_map_001/index.html',
   p45_1: 'modules/interactive_map_002/index.html',
   p51_1: 'modules/interactive_map_003/index.html',
-  p66_1: 'modules/interactive_map_004/index.html'
+  p66_1: 'modules/interactive_map_004/index.html',
+  p68_1: 'modules/interactive_map_005/index.html',
+  p79_1: 'modules/interactive_map_006/index.html',
+  p118_1: 'modules/interactive_map_007/index.html'
 });
 
 function getImageFileKey(src) {
