@@ -685,6 +685,27 @@ p.friend {
 	text-transform:none;
 	widows:1;
 }
+p.heading-3-item {
+	color:#4c94d8;
+	font-family:"Akrobat Bold", sans-serif;
+	font-size:19px;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:bold;
+	line-height:1.2;
+	margin-bottom:17px;
+	margin-left:0;
+	margin-right:0;
+	margin-top:0;
+	orphans:99;
+	page-break-after:avoid;
+	page-break-before:auto;
+	text-align:center;
+	text-decoration:none;
+	text-indent:0;
+	text-transform:none;
+	widows:1;
+}
 p.introduction {
 	color:#000000;
 	font-family:"Times New Roman (OTF) Regular", sans-serif;
@@ -1118,7 +1139,7 @@ p.ParaOverride-10 {
 	text-align:left;
 }
 p.ParaOverride-11 {
-	margin-left:283px;
+	margin-left:57px;
 	text-align:left;
 }
 p.ParaOverride-12 {
@@ -1452,7 +1473,22 @@ p.ParaOverride-97 {
 	text-indent:0px;
 }
 p.ParaOverride-98 {
-	margin-left:57px;
+	margin-top:14px;
+	text-align:left;
+	text-indent:0px;
+}
+p.ParaOverride-99 {
+	margin-top:17px;
+	text-align:center;
+	text-indent:0px;
+}
+p.ParaOverride-100 {
+	margin-top:31px;
+	text-align:left;
+	text-indent:0px;
+}
+p.ParaOverride-101 {
+	margin-top:11px;
 	text-align:left;
 	text-indent:0px;
 }
@@ -1470,13 +1506,13 @@ span.CharOverride-3 {
 	font-weight:bold;
 }
 span.CharOverride-4 {
-	font-variant:normal;
-	text-transform:uppercase;
-}
-span.CharOverride-5 {
 	font-size:15px;
 	font-style:italic;
 	font-weight:bold;
+}
+span.CharOverride-5 {
+	font-variant:normal;
+	text-transform:uppercase;
 }
 span.CharOverride-6 {
 	font-family:Arial, sans-serif;
@@ -1599,119 +1635,84 @@ span.CharOverride-32 {
 	font-weight:600;
 }
 span.CharOverride-33 {
+	color:#009fe3;
+	font-family:"Times New Roman (OTF) Regular", sans-serif;
+	font-style:normal;
+	font-weight:normal;
+}
+span.CharOverride-34 {
+	font-family:"Times New Roman (OTF) Bold", sans-serif;
+	font-style:normal;
+	font-weight:normal;
+}
+span.CharOverride-35 {
 	font-family:"Times New Roman (OTF) Regular", sans-serif;
 	font-size:13px;
 	font-style:normal;
 	font-weight:normal;
 }
-span.CharOverride-34 {
+span.CharOverride-36 {
 	font-family:"Open Sans", sans-serif;
 	font-style:normal;
 	font-weight:normal;
-}
-span.CharOverride-35 {
-	font-family:"Open Sans", sans-serif;
-	font-style:italic;
-	font-weight:normal;
-}
-span.CharOverride-36 {
-	color:#ffffff;
 }
 span.CharOverride-37 {
+	font-family:"Open Sans", sans-serif;
+	font-style:italic;
+	font-weight:normal;
+}
+span.CharOverride-38 {
+	color:#ffffff;
+}
+span.CharOverride-39 {
 	font-size:13px;
 	font-style:normal;
 	font-weight:bold;
 }
-span.CharOverride-38 {
+span.CharOverride-40 {
 	font-size:13px;
 	font-style:italic;
 	font-weight:normal;
 }
-span.CharOverride-39 {
+span.CharOverride-41 {
 	font-family:"PT Serif", serif;
-	font-style:normal;
-	font-weight:normal;
-}
-span.CharOverride-40 {
-	font-family:"PT Serif", serif;
+	font-size:12px;
 	font-style:normal;
 	font-weight:bold;
 }
-span.CharOverride-41 {
-	font-family:Akrobat, sans-serif;
-	font-style:normal;
-	font-weight:500;
-}
 span.CharOverride-42 {
-	color:#009fe3;
-	font-family:"Akrobat Black", sans-serif;
+	font-family:"PT Serif", serif;
+	font-size:12px;
 	font-style:normal;
-	font-variant:normal;
-	font-weight:900;
-	text-transform:uppercase;
+	font-weight:normal;
 }
 span.CharOverride-43 {
 	color:#009fe3;
 	font-family:"PT Serif", serif;
+	font-size:12px;
 	font-style:normal;
+	font-variant:normal;
 	font-weight:bold;
+	text-transform:uppercase;
 }
 span.CharOverride-44 {
 	color:#009fe3;
 	font-family:"PT Serif", serif;
-	font-style:normal;
-	font-weight:normal;
-}
-span.CharOverride-45 {
-	color:#009fe3;
-	font-family:"Akrobat Black", sans-serif;
-	font-style:normal;
-	font-weight:900;
-}
-span.CharOverride-46 {
-	color:#009fe3;
-	font-family:"Akrobat Black", sans-serif;
 	font-size:12px;
-	font-style:normal;
-	font-variant:normal;
-	font-weight:900;
-	text-transform:uppercase;
-}
-span.CharOverride-47 {
-	font-family:"PT Serif", serif;
-	font-style:normal;
-	font-variant:normal;
-	font-weight:normal;
-	text-transform:uppercase;
-}
-span.CharOverride-48 {
-	font-family:"PT Serif", serif;
-	font-size:11px;
-	font-style:normal;
-	font-weight:normal;
-}
-span.CharOverride-49 {
-	font-size:10px;
-	font-style:italic;
-	font-weight:normal;
-}
-span.CharOverride-50 {
-	font-size:11px;
 	font-style:normal;
 	font-weight:bold;
 }
-span.CharOverride-51 {
-	font-size:15px;
-}
-span.CharOverride-52 {
-	font-family:Herold, sans-serif;
-	font-size:18px;
+span.CharOverride-45 {
+	font-family:"PT Serif", serif;
+	font-size:12px;
 	font-style:normal;
+	font-variant:normal;
 	font-weight:normal;
+	text-transform:uppercase;
 }
-span.CharOverride-53 {
-	font-family:"ST-Nizhegorodsky", sans-serif;
-	font-size:15px;
+span.CharOverride-46 {
+	font-family:"PT Serif", serif;
+	font-size:10px;
 	font-style:normal;
 	font-weight:normal;
 }

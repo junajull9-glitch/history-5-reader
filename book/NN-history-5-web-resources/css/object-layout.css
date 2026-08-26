@@ -760,7 +760,7 @@ div.OBJ_map {
     p.ResultHead,
     p.ParagraphQuestion,
     p.ChapterQuestion,
-    p.term_word
+    p.term_words
 ) {
     display: flow-root;
     width: auto;
@@ -4917,12 +4917,3 @@ table img {
         box-sizing: border-box !important;
     }
 }
-
-
-/* Interactive OBJ_map anchors: keep the whole map group tappable after mobile reflow. */
-.reader-interactive-map-anchor,
-.reader-interactive-map-anchor .OBJ_map,
-.reader-interactive-map-anchor .OBJ_map img {
-    pointer-events: auto !important;
-}
-.reader-interactive-map-anchor .OBJ_map img { cursor: pointer !important; }

@@ -33,6 +33,7 @@
   let selectionToolbar = null;
   let glossaryEntries = [];
   let glossaryPopup = null;
+  let interactiveMapTooltip = null;
 
   const post = (type, payload) => parent.postMessage({ source: 'reader-book', type, payload }, '*');
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -80,11 +81,15 @@
       .reader-search-hit{background:#ffe56d!important;color:#111!important;border-radius:2px}
       .reader-search-hit.is-active{outline:2px solid #a34b18}
       .reader-note-highlight{display:inline;background-image:none!important;border-radius:2px;box-shadow:inset 0 -2px rgba(0,0,0,.12);color:inherit!important;cursor:pointer}
-      .reader-selection-toolbar{position:fixed;z-index:2147483646;display:flex;gap:6px;padding:6px;border-radius:8px;background:#26352c;box-shadow:0 4px 16px #0005;pointer-events:auto}
+      .reader-selection-toolbar{position:fixed;z-index:2147483646;display:flex;gap:6px;padding:2px;border:1px solid #c8b78f;border-radius:8px;background:#eadfbd;box-shadow:0 2px 8px #0002;pointer-events:auto}
       .reader-selection-toolbar[hidden]{display:none}
       .reader-selection-toolbar button{border:0;border-radius:6px;padding:7px 10px;background:#f1e4cc;color:#29271e;cursor:pointer;font:14px Arial,sans-serif}
-      @media(max-width:820px){.reader-selection-toolbar{justify-content:center;padding:8px;border-radius:12px;isolation:isolate}.reader-selection-toolbar:after{content:'';position:absolute;left:50%;bottom:-8px;width:16px;height:16px;background:#26352c;transform:translateX(-50%) rotate(45deg);z-index:-1}.reader-selection-toolbar button{width:100%;min-height:44px;padding:10px 14px;font:600 16px 'Open Sans',Arial,sans-serif}}
+      @media(max-width:820px){.reader-selection-toolbar{justify-content:center;padding:2px;border:1px solid #c8b78f;border-radius:10px;background:#eadfbd;isolation:isolate}.reader-selection-toolbar:after{content:'';position:absolute;left:50%;bottom:-6px;width:12px;height:12px;background:#eadfbd;border-right:1px solid #c8b78f;border-bottom:1px solid #c8b78f;transform:translateX(-50%) rotate(45deg);z-index:-1}.reader-selection-toolbar button{width:100%;min-height:44px;padding:10px 14px;font:600 16px 'Open Sans',Arial,sans-serif}}
       .reader-clickable-image{cursor:zoom-in}
+      .reader-interactive-map-anchor,.reader-interactive-map-anchor img{cursor:pointer!important}
+      .reader-interactive-map-tooltip{position:fixed;z-index:2147483645;display:block;max-width:min(280px,calc(100vw - 24px));padding:7px 10px;border:1px solid #c8b78f;border-radius:7px;background:#fff8e8;color:#29271e;box-shadow:0 3px 10px #0002;box-sizing:border-box;pointer-events:none;font:14px/1.25 Arial,sans-serif;white-space:nowrap}
+      .reader-interactive-map-tooltip[hidden]{display:none!important}
+      @media(max-width:820px),(hover:none){.reader-interactive-map-tooltip{display:none!important}}
       .term-word{cursor:help;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-thickness:1px;text-underline-offset:.14em}
       @font-face{font-family:"Reader PT Serif";src:url("../fonts/PTSerif-Regular.ttf") format("truetype");font-style:normal;font-weight:400;font-display:swap}
       @font-face{font-family:"Reader PT Serif";src:url("../fonts/PTSerif-Bold.ttf") format("truetype");font-style:normal;font-weight:700;font-display:swap}
@@ -357,6 +362,46 @@
     }
   }
 
+  function ensureInteractiveMapTooltip() {
+    if (interactiveMapTooltip?.isConnected) return interactiveMapTooltip;
+    interactiveMapTooltip = document.createElement('div');
+    interactiveMapTooltip.className = 'reader-interactive-map-tooltip';
+    interactiveMapTooltip.textContent = 'Открыть интерактивную карту';
+    interactiveMapTooltip.hidden = true;
+    document.body.appendChild(interactiveMapTooltip);
+    return interactiveMapTooltip;
+  }
+
+  function hideInteractiveMapTooltip() {
+    if (!interactiveMapTooltip) return;
+    interactiveMapTooltip.hidden = true;
+  }
+
+  function showInteractiveMapTooltip(target, event) {
+    if (readerRenderedWidth() <= 820 || window.matchMedia?.('(hover: none)').matches) return;
+    const tooltip = ensureInteractiveMapTooltip();
+    tooltip.hidden = false;
+
+    const targetRect = target.getBoundingClientRect();
+    const tipRect = tooltip.getBoundingClientRect();
+    const gap = 8;
+
+    let left = Number(event?.clientX || 0) + 12;
+    let top = targetRect.top - tipRect.height - gap;
+
+    if (top < 8) top = targetRect.bottom + gap;
+    if (left + tipRect.width > window.innerWidth - 8) {
+      left = window.innerWidth - tipRect.width - 8;
+    }
+    if (left < 8) left = 8;
+    if (top + tipRect.height > window.innerHeight - 8) {
+      top = Math.max(8, window.innerHeight - tipRect.height - 8);
+    }
+
+    tooltip.style.left = `${Math.round(left)}px`;
+    tooltip.style.top = `${Math.round(top)}px`;
+  }
+
   function prepareDocument() {
     syncReaderMobileShellClass();
     injectStyles();
@@ -384,39 +429,72 @@
     // content to bleed through around the centered sheet.
     document.body.replaceChildren(viewport);
 
-    // Registered interactive OBJ_map modules get a delegated click target on the
-    // whole InDesign map group. This is more reliable on mobile Safari than
-    // relying only on the IMG click after mobile reflow/pagination.
-    flow.querySelectorAll('.OBJ_map').forEach(mapNode => {
-      const group = mapNode.parentElement;
-      if (!group || group.dataset.readerInteractiveBound === '1') return;
-      const img = group.querySelector('.OBJ_map img');
-      if (!img) return;
+    // Registered interactive OBJ_map modules.
+    // Важно: внутри OBJ_map перед самой картой может находиться служебная
+    // картинка в подписи (например 3.png). Поэтому нельзя брать первый IMG.
+    // Ищем среди ВСЕХ изображений группы именно файл, зарегистрированный
+    // как интерактивный модуль.
+    const registeredInteractiveMapKeys = new Set([
+      'p22_1','p45_1','p51_1','p66_1','p68_1','p79_1','p118_1'
+    ]);
 
+    const interactiveImageKey = img => {
       const originalSrc = img.getAttribute('src') || '';
       const cleanName = originalSrc.split('#')[0].split('?')[0].split('/').pop()?.split('\\').pop() || '';
       const stem = cleanName.replace(/\.[^.]+$/, '').trim().toLowerCase();
       const numbered = stem.match(/^p0*(\d+)[_ -]+0*(\d+)$/i);
-      const imageKey = numbered
+      return numbered
         ? `p${Number(numbered[1])}_${Number(numbered[2])}`
         : stem.replace(/[\s-]+/g, '_');
-      if (!['p22_1','p45_1','p51_1','p66_1','p68_1','p79_1','p118_1'].includes(imageKey)) return;
+    };
 
-      group.dataset.readerInteractiveBound = '1';
+    flow.querySelectorAll('.OBJ_map').forEach(mapNode => {
+      const group = mapNode.parentElement;
+      if (!group) return;
+
+      const img = Array.from(group.querySelectorAll('img')).find(candidate =>
+        registeredInteractiveMapKeys.has(interactiveImageKey(candidate))
+      );
+      if (!img || img.dataset.readerInteractiveMapBound === '1') return;
+
+      const imageKey = interactiveImageKey(img);
+      const originalSrc = img.getAttribute('src') || '';
+
+      img.dataset.readerInteractiveMapBound = '1';
+      img.dataset.readerInteractiveMap = '1';
       group.classList.add('reader-interactive-map-anchor');
-      group.addEventListener('click', event => {
-        if (event.target.closest('a,button,input,textarea,select')) return;
-        event.preventDefault();
-        event.stopPropagation();
-        const currentSrc = img.currentSrc || img.src || originalSrc;
-        post('openImageViewer', {
-          src: currentSrc, currentSrc, originalSrc, imageKey,
-          isInteractiveMap: true, objectStyle: 'OBJ_map',
-          alt: img.alt || '', caption: imageCaption(img),
-          sourceWidth: img.getBoundingClientRect().width,
-          sourceHeight: img.getBoundingClientRect().height
-        });
-      }, true);
+
+      const interactiveMapHint = 'Открыть интерактивную карту';
+      group.setAttribute('aria-label', interactiveMapHint);
+      img.setAttribute('aria-label', interactiveMapHint);
+
+      img.addEventListener('pointerenter', event => showInteractiveMapTooltip(img, event));
+      img.addEventListener('pointermove', event => {
+        if (!interactiveMapTooltip || interactiveMapTooltip.hidden) return;
+        showInteractiveMapTooltip(img, event);
+      });
+      img.addEventListener('pointerleave', hideInteractiveMapTooltip);
+      img.addEventListener('pointercancel', hideInteractiveMapTooltip);
+
+      // Клик оставляем на группе, чтобы мобильная версия по-прежнему
+      // надёжно открывала модуль после reflow, но привязываем обработчик
+      // только один раз к конкретной интерактивной карте.
+      if (group.dataset.readerInteractiveClickBound !== imageKey) {
+        group.dataset.readerInteractiveClickBound = imageKey;
+        group.addEventListener('click', event => {
+          if (event.target.closest('a,button,input,textarea,select')) return;
+          event.preventDefault();
+          event.stopPropagation();
+          const currentSrc = img.currentSrc || img.src || originalSrc;
+          post('openImageViewer', {
+            src: currentSrc, currentSrc, originalSrc, imageKey,
+            isInteractiveMap: true, objectStyle: 'OBJ_map',
+            alt: img.alt || '', caption: imageCaption(img),
+            sourceWidth: img.getBoundingClientRect().width,
+            sourceHeight: img.getBoundingClientRect().height
+          });
+        }, true);
+      }
     });
 
     flow.querySelectorAll('img').forEach(img => {
@@ -907,8 +985,26 @@
     content.style.marginTop = `${correction.toFixed(2)}px`;
   }
 
+  function dismissSelectionToolbar() {
+    clearTimeout(document._readerSelectionTimer);
+    if (selectionToolbar) selectionToolbar.hidden = true;
+    cachedSelection = null;
+    try { getSelection()?.removeAllRanges(); } catch (_) {}
+    post('selectionAvailable', null);
+  }
+
   function renderPage(animate = true) {
     if (!flow) return;
+
+    // Any page change closes transient overlays belonging to the old page.
+    // This includes both the floating note command and the glossary popup.
+    closeGlossaryPopup();
+
+    // Any page change invalidates the current text selection. Hide the
+    // floating "Добавить заметку" command immediately and clear the
+    // selection so Safari/Chromium cannot resurrect it after rendering.
+    dismissSelectionToolbar();
+
     pages.forEach((page, index) => page.classList.toggle('is-active', index === pageIndex));
     normalizeActivePageTop();
     requestAnimationFrame(normalizeActivePageTop);
@@ -940,19 +1036,52 @@
     const selectors = ['[data-toc-title]', 'h1', 'h2', 'h3', '.Chapter', '.Chapter1', '.Paragraph', '.item'];
     const seen = new Set();
     const items = [];
+
     flow.querySelectorAll(selectors.join(',')).forEach((element, index) => {
       const title = cleanText(element.dataset.tocTitle || element.textContent);
       if (!title || title.length > 180 || seen.has(title)) return;
       seen.add(title);
+
       if (!element.id) element.id = `reader-toc-${index}`;
+
       const headingMatch = /^H([1-3])$/.exec(element.tagName);
       const level = headingMatch
         ? Number(headingMatch[1])
         : element.classList.contains('Paragraph')
           ? 2
           : 1;
-      items.push({ target: element.id, title, level, pageIndex: elementPageIndex(element) });
+
+      items.push({
+        target: element.id,
+        title,
+        level,
+        pageIndex: elementPageIndex(element)
+      });
     });
+
+    /*
+     * Диапазон страниц:
+     * конец пункта = страница, на которой начинается следующий
+     * пункт того же или более высокого уровня.
+     *
+     * Граничная страница намеренно входит в оба диапазона:
+     * например § 6 — стр. 37–41, § 7 — стр. 41–52.
+     */
+    items.forEach((item, index) => {
+      const startPage = item.pageIndex + 1;
+
+      let endPage = pageCount;
+      const nextItem = items[index + 1];
+
+      if (nextItem) {
+        const nextStartPage = nextItem.pageIndex + 1;
+        endPage = Math.max(startPage, nextStartPage - 1);
+      }
+
+      item.pageStart = startPage;
+      item.pageEnd = endPage;
+    });
+
     post('toc', items);
   }
 
@@ -1316,6 +1445,9 @@
       case 'searchNext': moveSearch(1); break;
       case 'searchPrev': moveSearch(-1); break;
       case 'getSelection': post('selection', cachedSelection); break;
+      case 'dismissSelectionToolbar':
+        dismissSelectionToolbar();
+        break;
       case 'applyNotes': notes = Array.isArray(payload.notes) ? payload.notes : []; applyNotes(); break;
       case 'gotoNote': gotoAnchor(payload.note?.anchor || payload.note); break;
       case 'toggleCurrentPageBookmark': post('togglePageBookmark', currentBookmark()); break;

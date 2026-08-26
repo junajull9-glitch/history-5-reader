@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <title>История нашего края — электронный учебник</title>
   <link rel="stylesheet" href="fonts/fonts.css">
-  <link rel="stylesheet" href="app/styles/reader.css?v=desktop-resize-model-6">
+  <link rel="stylesheet" href="app/styles/reader.css?v=toc-page-ranges-1">
 
 <style id="desktop-toc-compact-layout-fix">
     @media (min-width: 821px) and (max-width: 1100px) {
@@ -82,14 +82,13 @@
       <section class="panel compact" id="bookmarksPanel"><div class="panel-title"><span>🔖</span><b>Закладки</b><button id="closeBookmarks" class="mobile-drawer-close" type="button" aria-label="Закрыть закладки">×</button><button id="addBookmark" class="single-bookmark-add" type="button" title="Добавить закладку на текущей странице" aria-label="Добавить закладку">＋</button></div><div id="bookmarkList" class="item-list"></div></section>
       <section class="panel notes" id="notesPanel"><div class="panel-title"><span>✎</span><b>Заметки</b><button id="closeNotes" class="mobile-drawer-close" type="button" aria-label="Закрыть заметки">×</button><button id="addNote">＋</button></div><div id="noteList" class="item-list"></div></section>
     </aside>
+    <button id="desktopRightToggle" class="desktop-right-edge-toggle" type="button" aria-controls="bookmarksPanel notesPanel" aria-expanded="true" title="Свернуть боковую панель" aria-label="Свернуть боковую панель">›</button>
   </main>
 
   <footer class="bottombar">
     <div class="desktop-panel-controls" aria-label="Боковые панели">
       <button id="homeBtn" class="home">⌂ <span>Домой</span></button>
       <button id="desktopTocToggle" class="desktop-panel-toggle is-active" type="button" aria-controls="tocPanel" aria-expanded="true" title="Показать или скрыть содержание"><span aria-hidden="true">☰</span><span>Содержание</span></button>
-      <button id="desktopBookmarksToggle" class="desktop-panel-toggle is-active" type="button" aria-controls="bookmarksPanel" aria-expanded="true" title="Показать или скрыть закладки"><span aria-hidden="true">🔖</span><span>Закладки</span></button>
-      <button id="desktopNotesToggle" class="desktop-panel-toggle is-active" type="button" aria-controls="notesPanel" aria-expanded="true" title="Показать или скрыть заметки"><span aria-hidden="true">✎</span><span>Заметки</span></button>
     </div>
     <div class="footer-navigation">
       <div class="page-nav"><button id="bottomPrev">‹</button><label>Стр. <input id="pageInput" value="1" inputmode="numeric" enterkeyhint="go" aria-label="Номер страницы"></label><button id="pageGo" class="page-go" type="button" title="Перейти к странице" aria-label="Перейти к странице">OK</button><button id="bottomNext">›</button></div>
@@ -124,6 +123,6 @@
 <script src="config/reader-config.js"></script>
 <script src="app/services/storage.js"></script>
 <script src="app/bookmarks.js?v=mobile-notes-step4"></script>
-<script src="app/reader.js?v=desktop-resize-model-6"></script>
+<script src="app/reader.js?v=toc-page-ranges-1"></script>
 </body>
 </html>

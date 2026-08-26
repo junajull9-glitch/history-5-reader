@@ -17,6 +17,8 @@ p.HeadRED,
 p.HeadBlue {
     -webkit-hyphens: none !important;
     hyphens: none !important;
+
+    font-weight: 700 !important;
 }
 
 /* ==========================================================
@@ -26,12 +28,12 @@ p.HeadBlue {
 :root {
     --reader-font-scale: 1;
     --main-font-size: 18px;
-    --heading-font-family: "Oswald", "Open Sans", sans-serif;
+    --heading-font-family: "Open Sans", sans-serif;
     --main-paragraph-spacing: 1pt;
 }
 
 p.main {
-    font-family: "PT Serif", serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         var(--main-font-size) * var(--reader-font-scale)
@@ -48,7 +50,7 @@ p.main {
  Цвет, жирность и курсив не переопределяются.
 */
 p.main span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
 }
 
@@ -57,7 +59,7 @@ p.main span {
    ========================================================== */
 
 p.friend {
-    font-family: "PT Serif", serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         var(--main-font-size) * var(--reader-font-scale)
@@ -78,7 +80,7 @@ p.friend {
 }
 
 p.friend span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
     font-weight: inherit !important;
 }
@@ -96,7 +98,7 @@ p.friend span {
 }
 
 p.table {
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -110,7 +112,7 @@ p.table {
 }
 
 p.table span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
 }
 
@@ -128,7 +130,7 @@ p.table span {
 }
 
 p.introduction {
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -142,7 +144,7 @@ p.introduction {
 }
 
 p.introduction span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
 }
 
@@ -161,7 +163,7 @@ p.introduction span {
 }
 
 p.Question {
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -192,7 +194,7 @@ p.Question {
 }
 
 p.Question span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
 }
 
@@ -213,7 +215,7 @@ p.Question span {
 }
 
 p.Question3 {
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -244,7 +246,7 @@ p.Question3 {
 }
 
 p.Question3 span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
 }
 
@@ -266,7 +268,7 @@ p.Question3 span {
 }
 
 p.Question2 {
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -297,7 +299,7 @@ p.Question2 {
 }
 
 p.Question2 span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
 }
 
@@ -314,7 +316,7 @@ p.Question2 span {
 }
 
 p.mainQuestion {
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -332,19 +334,19 @@ p.mainQuestion {
 }
 
 p.mainQuestion span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
     line-height: inherit !important;
 }
 
 p.mainQuestion span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
     line-height: inherit !important;
 }
 
 p.mainQuestion span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
 }
 
@@ -357,7 +359,7 @@ p.mainQuestion span {
 }
 
 p.Inset{
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (var(--main-font-size) - var(--inset-font-offset))
@@ -371,7 +373,7 @@ p.Inset{
    но сохраняют цвет, жирность, курсив и т.д. */
 
 p.Inset span{
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
 }
 
@@ -389,7 +391,7 @@ p.Inset span{
 }
 
 p.key {
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (var(--main-font-size) - var(--key-font-offset))
@@ -409,7 +411,7 @@ p.key {
 }
 
 p.key span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
     line-height: inherit !important;
     text-align: inherit !important;
@@ -424,7 +426,7 @@ p.key span {
 }
 
 p.TXT_Caption{
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (var(--main-font-size) - var(--txt-caption-font-offset))
@@ -438,7 +440,7 @@ p.TXT_Caption{
    но сохраняют цвет, жирность, курсив и т.д. */
 
 p.TXT_Caption span{
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
 }
 
@@ -452,7 +454,7 @@ p.TXT_Caption span{
 }
 
 p.Result{
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (var(--main-font-size) - var(--result-font-offset))
@@ -466,7 +468,7 @@ p.Result{
    но сохраняют цвет, жирность, курсив и т.д. */
 
 p.Result span{
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
 }
 
@@ -482,7 +484,7 @@ p.Result span{
 }
 
 p.Attention{
-    font-family: "PT Serif", serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (var(--main-font-size) - var(--attention-font-offset))
@@ -498,7 +500,7 @@ p.Attention{
    но сохраняют цвет, жирность, курсив и т.д. */
 
 p.Attention span{
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
 }
 
@@ -513,7 +515,7 @@ p.Attention span{
 }
 
 p.introduction{
-    font-family: "PT Serif", serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (var(--main-font-size) - var(--attention-font-offset))
@@ -528,7 +530,7 @@ p.introduction{
    но сохраняют цвет, жирность, курсив и т.д. */
 
 p.introduction span{
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
 }
 
@@ -552,7 +554,7 @@ p.introduction span{
 }
 
 p.term_word {
-    font-family: "PT Serif", serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -611,7 +613,7 @@ p.term_word:not(:has(+ p.term_word)) {
 
 /* Внутренние фрагменты наследуют размер и интервал абзаца */
 p.term_word span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
     line-height: inherit !important;
 }
@@ -629,7 +631,7 @@ p.term_word span {
 
 p.List {
 
-    font-family: "PT Serif", serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -645,7 +647,7 @@ p.List {
 }
 
 p.List span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
     line-height: inherit !important;
 }
@@ -686,7 +688,7 @@ p.ParagraphQuestion {
             + var(--paragraph-question-text-offset)
         ) !important;
 
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -725,7 +727,7 @@ p.ParagraphQuestion + p.ParagraphQuestion {
 
 /* Вложенные фрагменты сохраняют локальное начертание InDesign */
 p.ParagraphQuestion span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
     line-height: inherit !important;
 }
@@ -766,7 +768,7 @@ p.ChapterQuestion {
             + var(--chapter-question-text-offset)
         ) !important;
 
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -811,7 +813,7 @@ p.ChapterQuestion + p.ParagraphQuestion {
 
 /* Вложенные фрагменты сохраняют локальное начертание InDesign */
 p.ChapterQuestion span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
     line-height: inherit !important;
 }
@@ -844,7 +846,7 @@ p.document {
         var(--document-paragraph-gap)
         var(--document-padding-x) !important;
 
-    font-family: "PT Serif", serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         var(--main-font-size)
@@ -853,6 +855,7 @@ p.document {
 
     line-height: 1.3 !important;
     font-style: italic !important;
+    font-weight: 400 !important;
 
     background-color: var(--document-background) !important;
     background-image: none !important;
@@ -887,7 +890,7 @@ p.document + p.document {
 
 /* Локальные выделения сохраняют оформление InDesign */
 p.document span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
     line-height: inherit !important;
     font-style: inherit !important;
@@ -922,7 +925,7 @@ p.documentHead {
         var(--document-head-paragraph-gap)
         var(--document-head-padding-x) !important;
 
-    font-family: "PT Serif", serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         var(--main-font-size)
@@ -930,7 +933,6 @@ p.documentHead {
     ) !important;
 
     line-height: 1.3 !important;
-    font-weight: 600 !important;
     text-align: center !important;
 
     background-color: var(--document-head-background) !important;
@@ -966,10 +968,9 @@ p.documentHead + p.document {
 
 /* Вложенные фрагменты сохраняют гарнитуру и кегль заголовка */
 p.documentHead span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
     line-height: inherit !important;
-    font-weight: inherit !important;
 }
 
 /* ==========================================================
@@ -998,7 +999,7 @@ p.documentHead span {
 p.memory {
     display: block !important;
 
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -1114,7 +1115,7 @@ p.memory + p.memory {
    Вложенные стили InDesign */
 
 p.memory span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
     line-height: inherit !important;
 
@@ -1144,7 +1145,7 @@ p.memory span {
 
 p.Paragraph{
 
-    font-family: var(--heading-font-family) !important;
+    font-family: "Open Sans", sans-serif;
 
     font-weight: 400 !important;
     letter-spacing: 0.02em !important;
@@ -1173,7 +1174,7 @@ p.Paragraph{
 
 p.Paragraph span{
 
-    font-family:inherit !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size:inherit !important;
 
@@ -1202,8 +1203,7 @@ p.Paragraph span{
 
 
 p.HeadRED {
-    font-family: var(--heading-font-family) !important;
-    font-weight: 300 !important;
+    font-family: "Open Sans", sans-serif;
     letter-spacing: 0em !important;
 
     font-size: calc(
@@ -1233,9 +1233,8 @@ p.HeadRED {
 
 
 p.HeadRED span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
-    font-weight: inherit !important;
     line-height: inherit !important;
     color: inherit !important;
 }
@@ -1259,8 +1258,7 @@ p.HeadRED span {
 
 
 p.HeadBlue {
-    font-family: var(--heading-font-family) !important;
-    font-weight: 300 !important;
+    font-family: "Open Sans", sans-serif;
     letter-spacing: 0em !important;
 
     font-size: calc(
@@ -1290,9 +1288,8 @@ p.HeadBlue {
 
 
 p.HeadBlue span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
-    font-weight: inherit !important;
     line-height: inherit !important;
     color: inherit !important;
 }
@@ -1314,8 +1311,7 @@ p.HeadBlue span {
 
 
 p.HeadGreen {
-    font-family: var(--heading-font-family) !important;
-    font-weight: 300 !important;
+    font-family: "Open Sans", sans-serif;
     letter-spacing: 0em !important;
 
     font-size: calc(
@@ -1345,9 +1341,8 @@ p.HeadGreen {
 
 
 p.HeadGreen span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
-    font-weight: inherit !important;
     line-height: inherit !important;
     color: inherit !important;
 }
@@ -1383,8 +1378,7 @@ p.HeadResult {
     width: 100% !important;
     max-width: 100% !important;
 
-    font-family: var(--heading-font-family) !important;
-    font-weight: 400 !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -1467,9 +1461,8 @@ p.HeadResult::after {
 
 
 p.HeadResult span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
-    font-weight: inherit !important;
     line-height: inherit !important;
     color: inherit !important;
 }
@@ -1503,7 +1496,7 @@ p.chapterResult {
     width: 100% !important;
     max-width: 100% !important;
 
-    font-family: "Open Sans", sans-serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -1574,7 +1567,7 @@ p.chapterResult + p.chapterResult {
 
 
 p.chapterResult span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
     line-height: inherit !important;
 }
@@ -1618,7 +1611,6 @@ p.Chapter1:has(> .ChapterWord) {
         sans-serif !important;
 
     font-size: 29px !important;
-    font-weight: 700 !important;
     font-style: normal !important;
     line-height: 1.04 !important;
 
@@ -1725,7 +1717,6 @@ p.Chapter1:has(> .ChapterWord) > .ChapterNumber {
 
     font-family: Georgia, "Times New Roman", serif !important;
     font-size: 64px !important;
-    font-weight: 700 !important;
     font-style: normal !important;
     line-height: 0.82 !important;
 
@@ -1758,7 +1749,6 @@ p.Chapter1:has(> .ChapterWord) > .ChapterTitle {
         sans-serif !important;
 
     font-size: inherit !important;
-    font-weight: 700 !important;
     font-style: normal !important;
     line-height: inherit !important;
 
@@ -1807,8 +1797,7 @@ p.ResultHead {
     width: 100% !important;
     max-width: 100% !important;
 
-    font-family: var(--heading-font-family) !important;
-    font-weight: 400 !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         (
@@ -1887,9 +1876,8 @@ p.ResultHead::after {
 
 
 p.ResultHead span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
-    font-weight: inherit !important;
     line-height: inherit !important;
     color: inherit !important;
 }
@@ -1906,7 +1894,7 @@ p.ResultHead span {
 
 p.link2 {
     /* Типографика как у main */
-    font-family: "PT Serif", serif !important;
+    font-family: "Open Sans", sans-serif;
 
     font-size: calc(
         var(--main-font-size) * var(--reader-font-scale)
@@ -1934,7 +1922,7 @@ p.link2 {
  * включая курсив и голубой цвет.
  */
 p.link2 span {
-    font-family: inherit !important;
+    font-family: "Open Sans", sans-serif;
     font-size: inherit !important;
     line-height: inherit !important;
     font-style: inherit !important;
@@ -1942,3 +1930,132 @@ p.link2 span {
 }
 
 
+
+
+/* ==========================================================
+   GLOBAL FONT NORMALIZATION
+   Open Sans everywhere, except ChapterWord and ChapterNumber.
+   ========================================================== */
+
+body,
+p,
+p span,
+div,
+div span,
+li,
+li span,
+td,
+th,
+a,
+button,
+input,
+textarea,
+select {
+    font-family: "Open Sans", sans-serif !important;
+}
+
+/* Исключения: специальные символьные стили главы */
+.ChapterWord {
+    font-family: Arial, Helvetica, sans-serif !important;
+}
+
+.ChapterNumber {
+    font-family: Georgia, "Times New Roman", serif !important;
+}
+
+
+
+/* ==========================================================
+   HEADING TYPOGRAPHY
+   Сужение применяется ТОЛЬКО к заголовочным стилям.
+   Обычный полужирный/жирный текст не сужается.
+   ========================================================== */
+
+p.HeadRED,
+p.HeadBlue,
+p.HeadGreen,
+p.HeadResult,
+p.ResultHead,
+p.documentHead,
+p.Paragraph,
+p.Chapter1:has(> .ChapterWord),
+p.Chapter1:has(> .ChapterWord) > .ChapterTitle {
+    font-family: "Open Sans", sans-serif !important;
+    font-stretch: 80% !important;
+    font-variation-settings: "wdth" 80, "wght" 700 !important;
+}
+
+p.HeadRED span,
+p.HeadBlue span,
+p.HeadGreen span,
+p.HeadResult span,
+p.ResultHead span,
+p.documentHead span,
+p.Paragraph span,
+p.Chapter1:has(> .ChapterWord) span {
+    font-family: inherit !important;
+}
+
+/* Специальные символьные стили главы остаются исключениями */
+p.Chapter1:has(> .ChapterWord) > .ChapterWord {
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-stretch: normal !important;
+    font-variation-settings: normal !important;
+}
+
+p.Chapter1:has(> .ChapterWord) > .ChapterNumber {
+    font-family: Georgia, "Times New Roman", serif !important;
+    font-stretch: normal !important;
+    font-variation-settings: normal !important;
+}
+
+
+/* ==========================================================
+   ITALIC WEIGHT FIX
+   Обычный курсив не должен становиться полужирным/жирным.
+   Заголовочные правила выше сохраняют собственный font-weight.
+   ========================================================== */
+
+/* Обычные курсивные символьные стили */
+.Italic,
+.ItalicChar,
+em,
+i {
+    font-family: "Open Sans", sans-serif !important;
+    font-style: italic !important;
+    font-weight: 400 !important;
+    font-stretch: normal !important;
+    font-variation-settings: "wght" 400 !important;
+}
+
+/* Если курсив находится ВНУТРИ настоящего заголовка,
+   он остаётся курсивным, но заголовок сохраняет жирность. */
+p.HeadRED .Italic,
+p.HeadRED .ItalicChar,
+p.HeadRED em,
+p.HeadRED i,
+p.HeadBlue .Italic,
+p.HeadBlue .ItalicChar,
+p.HeadBlue em,
+p.HeadBlue i,
+p.HeadGreen .Italic,
+p.HeadGreen .ItalicChar,
+p.HeadGreen em,
+p.HeadGreen i,
+p.HeadResult .Italic,
+p.HeadResult .ItalicChar,
+p.HeadResult em,
+p.HeadResult i,
+p.ResultHead .Italic,
+p.ResultHead .ItalicChar,
+p.ResultHead em,
+p.ResultHead i,
+p.documentHead .Italic,
+p.documentHead .ItalicChar,
+p.documentHead em,
+p.documentHead i,
+p.Paragraph .Italic,
+p.Paragraph .ItalicChar,
+p.Paragraph em,
+p.Paragraph i {
+}

@@ -352,6 +352,18 @@ let pageZoom = pageZoomIsAutomatic
   ? calculateAutomaticPageZoom()
   : (Number(load('pageZoom', 1)) || 1);
 pageZoom = isMobileReader() ? 1 : Math.max(0.6, Math.min(1.6, pageZoom));
+requestAnimationFrame(syncDesktopPageArrowPosition);
+
+function syncDesktopPageArrowPosition() {
+  if (isMobileReader()) return;
+  const stage = document.querySelector('.reader-stage');
+  if (!stage) return;
+  const stageWidth = Math.max(0, stage.getBoundingClientRect().width);
+  // book-bridge uses maxPageWidth=794 and reserves 28px inside the iframe.
+  const basePageWidth = Math.min(794, Math.max(280, stageWidth - 28));
+  const visibleWidth = Math.min(stageWidth, Math.round(basePageWidth * pageZoom));
+  stage.style.setProperty('--reader-visible-sheet-width', `${visibleWidth}px`);
+}
 
 function applyInterfaceScale(scale) {
   const value = Math.max(0.55, Math.min(1.5, Number(scale) || 1));
@@ -411,6 +423,7 @@ addEventListener('message', event => {
     $('#pageZoomRange').value = String(Math.round(pageZoom * 100));
     $('#pageZoomValue').textContent = Math.round(pageZoom * 100) + '%';
     save('pageZoom', pageZoom);
+    syncDesktopPageArrowPosition();
   }
 
   if (message.type === 'selectionAvailable') pendingSelection = message.payload || null;
@@ -434,7 +447,29 @@ function buildToc(items) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'toc-item level-' + item.level;
-    button.textContent = item.title;
+
+    const title = document.createElement('span');
+    title.className = 'toc-item-title';
+    title.textContent = item.title;
+
+    const pages = document.createElement('span');
+    pages.className = 'toc-item-pages';
+
+    const pageStart = Math.max(
+      1,
+      Number(item.pageStart) || (Number(item.pageIndex) + 1) || 1
+    );
+    const pageEnd = Math.max(
+      pageStart,
+      Number(item.pageEnd) || pageStart
+    );
+
+    pages.textContent = pageStart === pageEnd
+      ? `стр. ${pageStart}`
+      : `стр. ${pageStart}–${pageEnd}`;
+
+    button.append(title, pages);
+
     button.addEventListener('click', event => {
       event.preventDefault();
       event.stopPropagation();
@@ -444,6 +479,7 @@ function buildToc(items) {
       });
       if (isMobileReader()) window.closeMobileDrawers?.();
     });
+
     list.appendChild(button);
   });
 
@@ -493,6 +529,7 @@ pageZoomRange.addEventListener('input', event => {
   $('#pageZoomValue').textContent = Math.round(scale * 100) + '%';
   save('pageZoom', scale);
   send('pageZoom', { scale });
+  syncDesktopPageArrowPosition();
 });
 
 let automaticZoomResizeTimer = 0;
@@ -507,6 +544,7 @@ window.addEventListener('resize', () => {
     pageZoomRange.value = String(Math.round(scale * 100));
     $('#pageZoomValue').textContent = Math.round(scale * 100) + '%';
     send('pageZoom', { scale });
+    syncDesktopPageArrowPosition();
   }, 120);
 });
 
@@ -617,6 +655,9 @@ $('#saveNote').onclick = event => {
   renderNotes();
   send('applyNotes', { notes });
   $('#noteDialog').close();
+  // The note has been saved: immediately dismiss the floating
+  // "Добавить заметку" command and clear its cached selection.
+  send('dismissSelectionToolbar');
   pendingSelection = null;
   editingNote = null;
 };
@@ -726,62 +767,38 @@ if (addBookmarkButton) {
 
 
 /* ==========================================================
-   Desktop collapsible Bookmarks / Notes panels.
-   Mobile drawer logic below remains independent.
+   Desktop right drawer: Bookmarks + Notes collapse together
+   into a single edge tab. Mobile drawer logic stays independent.
    ========================================================== */
-(function initDesktopRightPanels(){
+(function initDesktopRightPanel(){
   const workspace = document.querySelector('.workspace');
   const rightColumn = document.querySelector('.right-column');
-  const bookmarksPanel = document.getElementById('bookmarksPanel');
-  const notesPanel = document.getElementById('notesPanel');
-  const bookmarksToggle = document.getElementById('desktopBookmarksToggle');
-  const notesToggle = document.getElementById('desktopNotesToggle');
-  if (!workspace || !rightColumn || !bookmarksPanel || !notesPanel || !bookmarksToggle || !notesToggle) return;
+  const edgeToggle = document.getElementById('desktopRightToggle');
+  if (!workspace || !rightColumn || !edgeToggle) return;
 
   const desktopQuery = window.matchMedia('(min-width: 821px)');
-  const compactDesktopQuery = window.matchMedia('(min-width: 821px) and (max-width: 1100px)');
-  const initiallyWide = window.matchMedia('(min-width: 1281px)').matches;
-  let bookmarksOpen = initiallyWide;
-  let notesOpen = initiallyWide;
-  let wasCompact = compactDesktopQuery.matches;
+  let open = window.matchMedia('(min-width: 1281px)').matches;
 
   function render(){
-    const compactNow = compactDesktopQuery.matches;
-    if (compactNow && !wasCompact) {
-      bookmarksOpen = false;
-      notesOpen = false;
-    }
-    wasCompact = compactNow;
     if (!desktopQuery.matches) {
       workspace.classList.remove('desktop-right-collapsed');
-      rightColumn.classList.remove('desktop-bookmarks-closed','desktop-notes-closed','desktop-right-drawer');
-      bookmarksToggle.classList.remove('is-active');
-      notesToggle.classList.remove('is-active');
-      bookmarksToggle.setAttribute('aria-expanded','false');
-      notesToggle.setAttribute('aria-expanded','false');
+      rightColumn.classList.remove('desktop-right-drawer');
+      edgeToggle.setAttribute('aria-expanded','false');
       return;
     }
 
-    rightColumn.classList.toggle('desktop-bookmarks-closed', !bookmarksOpen);
-    rightColumn.classList.toggle('desktop-notes-closed', !notesOpen);
     rightColumn.classList.toggle('desktop-right-drawer', window.matchMedia('(max-width: 1280px)').matches);
-    workspace.classList.toggle('desktop-right-collapsed', !bookmarksOpen && !notesOpen);
-
-    bookmarksToggle.classList.toggle('is-active', bookmarksOpen);
-    notesToggle.classList.toggle('is-active', notesOpen);
-    bookmarksToggle.setAttribute('aria-expanded', String(bookmarksOpen));
-    notesToggle.setAttribute('aria-expanded', String(notesOpen));
+    workspace.classList.toggle('desktop-right-collapsed', !open);
+    edgeToggle.classList.toggle('is-collapsed', !open);
+    edgeToggle.textContent = open ? '›' : '‹';
+    edgeToggle.setAttribute('aria-expanded', String(open));
+    edgeToggle.setAttribute('title', open ? 'Свернуть закладки и заметки' : 'Развернуть закладки и заметки');
+    edgeToggle.setAttribute('aria-label', open ? 'Свернуть закладки и заметки' : 'Развернуть закладки и заметки');
   }
 
-  bookmarksToggle.addEventListener('click', () => {
+  edgeToggle.addEventListener('click', () => {
     if (!desktopQuery.matches) return;
-    bookmarksOpen = !bookmarksOpen;
-    render();
-  });
-
-  notesToggle.addEventListener('click', () => {
-    if (!desktopQuery.matches) return;
-    notesOpen = !notesOpen;
+    open = !open;
     render();
   });
 
@@ -789,8 +806,6 @@ if (addBookmarkButton) {
   desktopQuery.addEventListener?.('change', render);
   render();
 })();
-
-
 
 
 
@@ -949,3 +964,5 @@ renderNotes();
     window.setTimeout(applyReaderShellFit, 30);
   });
 })();
+
+window.addEventListener('resize', syncDesktopPageArrowPosition);
