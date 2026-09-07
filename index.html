@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <title>История нашего края — электронный учебник</title>
   <link rel="stylesheet" href="fonts/fonts.css">
-  <link rel="stylesheet" href="app/styles/reader.css?v=toc-page-ranges-1">
+  <link rel="stylesheet" href="app/styles/reader.css?v=right-panels-independent-2">
 
 <style id="desktop-toc-compact-layout-fix">
     @media (min-width: 821px) and (max-width: 1100px) {
@@ -62,6 +62,31 @@
       <button id="toggleToc" aria-controls="tocPanel" aria-expanded="true">Содержание</button>
       <button id="mobileBookmarks" class="mobile-only-action" aria-controls="bookmarksPanel">Закладки</button>
       <button id="mobileNotes" class="mobile-only-action" aria-controls="notesPanel">Заметки</button>
+
+      <button id="desktopBookmarksToggle"
+              class="desktop-right-top-toggle"
+              type="button"
+              aria-controls="bookmarksPanel"
+              aria-expanded="true"
+              title="Закладки"
+              aria-label="Закладки">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 3.5h10a1 1 0 0 1 1 1V21l-6-3.8L6 21V4.5a1 1 0 0 1 1-1Z"/>
+        </svg>
+      </button>
+
+      <button id="desktopNotesToggle"
+              class="desktop-right-top-toggle"
+              type="button"
+              aria-controls="notesPanel"
+              aria-expanded="true"
+              title="Заметки"
+              aria-label="Заметки">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 20l4.2-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20Zm9.8-12.8 3 3"/>
+        </svg>
+      </button>
+
       <button id="fullscreenBtn">Полный экран</button>
     </div>
   </header>
@@ -79,10 +104,34 @@
     </section>
 
     <aside class="right-column">
-      <section class="panel compact" id="bookmarksPanel"><div class="panel-title"><span>🔖</span><b>Закладки</b><button id="closeBookmarks" class="mobile-drawer-close" type="button" aria-label="Закрыть закладки">×</button><button id="addBookmark" class="single-bookmark-add" type="button" title="Добавить закладку на текущей странице" aria-label="Добавить закладку">＋</button></div><div id="bookmarkList" class="item-list"></div></section>
-      <section class="panel notes" id="notesPanel"><div class="panel-title"><span>✎</span><b>Заметки</b><button id="closeNotes" class="mobile-drawer-close" type="button" aria-label="Закрыть заметки">×</button><button id="addNote">＋</button></div><div id="noteList" class="item-list"></div></section>
+      <section class="panel compact" id="bookmarksPanel">
+        <div class="panel-title">
+          <span>🔖</span><b>Закладки</b>
+          <button id="closeBookmarks" class="mobile-drawer-close" type="button" aria-label="Закрыть закладки">×</button>
+          <button id="addBookmark" class="single-bookmark-add" type="button" title="Добавить закладку на текущей странице" aria-label="Добавить закладку">＋</button>
+        </div>
+        <div id="bookmarkList" class="item-list"></div>
+        <button id="collapseBookmarksDesktop"
+                class="desktop-panel-collapse-bottom"
+                type="button"
+                title="Свернуть Закладки"
+                aria-label="Свернуть Закладки">⌃</button>
+      </section>
+
+      <section class="panel notes" id="notesPanel">
+        <div class="panel-title">
+          <span>✎</span><b>Заметки</b>
+          <button id="closeNotes" class="mobile-drawer-close" type="button" aria-label="Закрыть заметки">×</button>
+          <button id="addNote">＋</button>
+        </div>
+        <div id="noteList" class="item-list"></div>
+        <button id="collapseNotesDesktop"
+                class="desktop-panel-collapse-bottom"
+                type="button"
+                title="Свернуть Заметки"
+                aria-label="Свернуть Заметки">⌃</button>
+      </section>
     </aside>
-    <button id="desktopRightToggle" class="desktop-right-edge-toggle" type="button" aria-controls="bookmarksPanel notesPanel" aria-expanded="true" title="Свернуть боковую панель" aria-label="Свернуть боковую панель">›</button>
   </main>
 
   <footer class="bottombar">
@@ -123,6 +172,6 @@
 <script src="config/reader-config.js"></script>
 <script src="app/services/storage.js"></script>
 <script src="app/bookmarks.js?v=mobile-notes-step4"></script>
-<script src="app/reader.js?v=toc-page-ranges-1"></script>
+<script src="app/reader.js?v=right-panels-independent-2"></script>
 </body>
 </html>

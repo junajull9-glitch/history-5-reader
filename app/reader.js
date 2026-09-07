@@ -354,15 +354,52 @@ let pageZoom = pageZoomIsAutomatic
 pageZoom = isMobileReader() ? 1 : Math.max(0.6, Math.min(1.6, pageZoom));
 requestAnimationFrame(syncDesktopPageArrowPosition);
 
+let lastPageGeometry = null;
+
 function syncDesktopPageArrowPosition() {
   if (isMobileReader()) return;
+
   const stage = document.querySelector('.reader-stage');
-  if (!stage) return;
-  const stageWidth = Math.max(0, stage.getBoundingClientRect().width);
-  // book-bridge uses maxPageWidth=794 and reserves 28px inside the iframe.
+  if (!stage || !frame) return;
+
+  const stageRect = stage.getBoundingClientRect();
+  const stageLocalWidth = stage.offsetWidth || stage.clientWidth || 1;
+  const stageScaleX = stageRect.width / stageLocalWidth;
+
+  /*
+   * Геометрию белого листа сообщает сам book-bridge через postMessage.
+   * Это принципиально: при file:// родитель не всегда может надёжно читать
+   * DOM iframe, поэтому предыдущие варианты фактически сваливались в fallback.
+   */
+  const g = lastPageGeometry;
+  if (g && g.viewportWidth > 0 && g.right > g.left) {
+    const frameRect = frame.getBoundingClientRect();
+    const iframeToVisualX = frameRect.width / g.viewportWidth;
+
+    const sheetVisualLeft = frameRect.left + g.left * iframeToVisualX;
+    const sheetVisualRight = frameRect.left + g.right * iframeToVisualX;
+
+    const sheetLocalLeft = (sheetVisualLeft - stageRect.left) / stageScaleX;
+    const sheetLocalRight = (sheetVisualRight - stageRect.left) / stageScaleX;
+
+    if (
+      Number.isFinite(sheetLocalLeft) &&
+      Number.isFinite(sheetLocalRight) &&
+      sheetLocalRight > sheetLocalLeft
+    ) {
+      stage.style.setProperty('--reader-sheet-left', `${sheetLocalLeft}px`);
+      stage.style.setProperty('--reader-sheet-right', `${sheetLocalRight}px`);
+      return;
+    }
+  }
+
+  /* Временный fallback только до первого сообщения от книги. */
+  const stageWidth = Math.max(0, stageLocalWidth);
   const basePageWidth = Math.min(794, Math.max(280, stageWidth - 28));
   const visibleWidth = Math.min(stageWidth, Math.round(basePageWidth * pageZoom));
-  stage.style.setProperty('--reader-visible-sheet-width', `${visibleWidth}px`);
+
+  stage.style.setProperty('--reader-sheet-left', `${(stageWidth - visibleWidth) / 2}px`);
+  stage.style.setProperty('--reader-sheet-right', `${(stageWidth + visibleWidth) / 2}px`);
 }
 
 function applyInterfaceScale(scale) {
@@ -389,12 +426,21 @@ addEventListener('message', event => {
   const message = event.data || {};
   if (message.source !== 'reader-book') return;
 
-  if (message.type === 'ready') send('init', { fontIndex, pageZoom, position: currentState, notes, bookmarks: window.ReaderBookmarks.getItems() });
+  if (message.type === 'ready') {
+    send('init', { fontIndex, pageZoom, position: currentState, notes, bookmarks: window.ReaderBookmarks.getItems() });
+    requestAnimationFrame(() => requestAnimationFrame(syncDesktopPageArrowPosition));
+  }
 
   if (message.type === 'state') {
     currentState = message.payload || currentState;
     $('#pageInput').value = currentState.page || '1';
     save('position', currentState);
+    requestAnimationFrame(() => requestAnimationFrame(syncDesktopPageArrowPosition));
+  }
+
+  if (message.type === 'pageGeometry') {
+    lastPageGeometry = message.payload || null;
+    requestAnimationFrame(syncDesktopPageArrowPosition);
   }
 
   if (message.type === 'toc') buildToc(message.payload || []);
@@ -767,46 +813,113 @@ if (addBookmarkButton) {
 
 
 /* ==========================================================
-   Desktop right drawer: Bookmarks + Notes collapse together
-   into a single edge tab. Mobile drawer logic stays independent.
+   Desktop / tablet right panels.
+   Bookmarks and Notes are controlled independently.
+   Mobile drawer logic below remains untouched.
    ========================================================== */
-(function initDesktopRightPanel(){
+(function initDesktopRightPanels(){
   const workspace = document.querySelector('.workspace');
   const rightColumn = document.querySelector('.right-column');
-  const edgeToggle = document.getElementById('desktopRightToggle');
-  if (!workspace || !rightColumn || !edgeToggle) return;
+
+  const bookmarksTop = document.getElementById('desktopBookmarksToggle');
+  const notesTop = document.getElementById('desktopNotesToggle');
+
+  const collapseBookmarks = document.getElementById('collapseBookmarksDesktop');
+  const collapseNotes = document.getElementById('collapseNotesDesktop');
+
+  if (!workspace || !rightColumn || !bookmarksTop || !notesTop) return;
 
   const desktopQuery = window.matchMedia('(min-width: 821px)');
-  let open = window.matchMedia('(min-width: 1281px)').matches;
+  const drawerQuery = window.matchMedia('(max-width: 1280px)');
+
+  /*
+   * На широком desktop обе панели открыты.
+   * На более узком laptop/tablet они стартуют закрытыми, чтобы не перекрывать
+   * страницу; открыть любую можно отдельной кнопкой в верхнем меню.
+   */
+  let bookmarksOpen = !drawerQuery.matches;
+  let notesOpen = !drawerQuery.matches;
+
+  function updateTopButton(button, open, label){
+    button.classList.toggle('is-active', open);
+    button.setAttribute('aria-expanded', String(open));
+    button.setAttribute('title', label);
+    button.setAttribute('aria-label', label);
+  }
 
   function render(){
     if (!desktopQuery.matches) {
       workspace.classList.remove('desktop-right-collapsed');
-      rightColumn.classList.remove('desktop-right-drawer');
-      edgeToggle.setAttribute('aria-expanded','false');
+      rightColumn.classList.remove(
+        'desktop-bookmarks-closed',
+        'desktop-notes-closed',
+        'desktop-right-drawer'
+      );
+      updateTopButton(bookmarksTop, false, 'Закладки');
+      updateTopButton(notesTop, false, 'Заметки');
       return;
     }
 
-    rightColumn.classList.toggle('desktop-right-drawer', window.matchMedia('(max-width: 1280px)').matches);
-    workspace.classList.toggle('desktop-right-collapsed', !open);
-    edgeToggle.classList.toggle('is-collapsed', !open);
-    edgeToggle.textContent = open ? '›' : '‹';
-    edgeToggle.setAttribute('aria-expanded', String(open));
-    edgeToggle.setAttribute('title', open ? 'Свернуть закладки и заметки' : 'Развернуть закладки и заметки');
-    edgeToggle.setAttribute('aria-label', open ? 'Свернуть закладки и заметки' : 'Развернуть закладки и заметки');
+    rightColumn.classList.toggle('desktop-right-drawer', drawerQuery.matches);
+    rightColumn.classList.toggle('desktop-bookmarks-closed', !bookmarksOpen);
+    rightColumn.classList.toggle('desktop-notes-closed', !notesOpen);
+
+    const nothingOpen = !bookmarksOpen && !notesOpen;
+    workspace.classList.toggle('desktop-right-collapsed', nothingOpen);
+
+    updateTopButton(bookmarksTop, bookmarksOpen, 'Закладки');
+    updateTopButton(notesTop, notesOpen, 'Заметки');
+
+    /*
+     * После изменения ширины рабочей области пересчитываем положение
+     * стрелок страницы по уже исправленной геометрии.
+     */
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (typeof syncDesktopPageArrowPosition === 'function') {
+          syncDesktopPageArrowPosition();
+        }
+      });
+    });
   }
 
-  edgeToggle.addEventListener('click', () => {
+  function toggleBookmarks(){
     if (!desktopQuery.matches) return;
-    open = !open;
+    bookmarksOpen = !bookmarksOpen;
+    render();
+  }
+
+  function toggleNotes(){
+    if (!desktopQuery.matches) return;
+    notesOpen = !notesOpen;
+    render();
+  }
+
+  bookmarksTop.addEventListener('click', toggleBookmarks);
+  notesTop.addEventListener('click', toggleNotes);
+  collapseBookmarks?.addEventListener('click', () => {
+    if (!desktopQuery.matches) return;
+    bookmarksOpen = false;
+    render();
+  });
+  collapseNotes?.addEventListener('click', () => {
+    if (!desktopQuery.matches) return;
+    notesOpen = false;
     render();
   });
 
   window.addEventListener('resize', render);
   desktopQuery.addEventListener?.('change', render);
+  drawerQuery.addEventListener?.('change', () => {
+    /*
+     * Не переопределяем выбор пользователя при простом resize:
+     * меняем только режим размещения панели (колонка / overlay).
+     */
+    render();
+  });
+
   render();
 })();
-
 
 
 /* Desktop height is controlled by the app-shell CSS grid. */

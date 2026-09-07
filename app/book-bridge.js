@@ -25,6 +25,9 @@
   let fontIndex = 1;
   let pageZoom = 1;
   let resizeTimer = 0;
+  window.addEventListener('resize', () => {
+    requestAnimationFrame(postPageGeometry);
+  }, { passive: true });
   let hits = [];
   let hitIndex = -1;
   let cachedSelection = null;
@@ -36,6 +39,26 @@
   let interactiveMapTooltip = null;
 
   const post = (type, payload) => parent.postMessage({ source: 'reader-book', type, payload }, '*');
+
+  function postPageGeometry() {
+    if (!flow) return;
+    const sheet = flow.querySelector('.reader-page-sheet.is-active');
+    if (!sheet) return;
+
+    const rect = sheet.getBoundingClientRect();
+    const viewportWidth =
+      document.documentElement?.clientWidth ||
+      window.innerWidth ||
+      1;
+
+    post('pageGeometry', {
+      left: rect.left,
+      right: rect.right,
+      width: rect.width,
+      viewportWidth
+    });
+  }
+
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const cleanText = value => String(value || '').normalize('NFC').replace(/\s+/g, ' ').trim();
 
@@ -1010,6 +1033,11 @@
     requestAnimationFrame(normalizeActivePageTop);
     viewport.scrollTo({ top: 0, left: 0, behavior: animate ? 'smooth' : 'auto' });
     postState();
+
+    requestAnimationFrame(() => {
+      postPageGeometry();
+      requestAnimationFrame(postPageGeometry);
+    });
   }
 
   function postState() {
