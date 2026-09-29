@@ -55,6 +55,36 @@ p.main span {
 }
 
 /* ==========================================================
+   стиль mainCenter — как main, но с выравниванием по центру
+   ========================================================== */
+
+p.mainCenter {
+    font-family: "Open Sans", sans-serif;
+
+    font-size: calc(
+        var(--main-font-size) * var(--reader-font-scale)
+    ) !important;
+
+    line-height: 1.3 !important;
+    text-align: center !important;
+
+    /* Пустой абзац должен занимать минимум одну строку */
+    min-height: 1.3em !important;
+}
+
+p.mainCenter span {
+    font-family: "Open Sans", sans-serif;
+    font-size: inherit !important;
+}
+
+/* Если абзац действительно пустой, создаём внутри него строку.
+   min-height выше также срабатывает для абзацев с пробелом, <br> или пустым span. */
+p.mainCenter:empty::before {
+    content: "\00a0";
+    display: inline !important;
+}
+
+/* ==========================================================
    стиль friend
    ========================================================== */
 
@@ -869,15 +899,11 @@ p.document {
    После documentHead дополнительный верхний отступ не нужен. */
 p.document:not(p.document + p.document):not(p.documentHead + p.document) {
     padding-top: var(--document-padding-top) !important;
-
-    font-weight: 700 !important;
 }
 
 /* Первый document после documentHead продолжает ту же серую плашку */
 p.documentHead + p.document {
     padding-top: var(--document-paragraph-gap) !important;
-
-    font-weight: 700 !important;
 }
 
 /* Последний абзац последовательной группы */
@@ -976,8 +1002,6 @@ p.documentHead + p.documentHead {
 /* Переход от documentHead к document остаётся непрерывным */
 p.documentHead + p.document {
     margin-top: 0 !important;
-
-    font-weight: 700 !important;
 }
 
 /* Вложенные фрагменты сохраняют гарнитуру и кегль заголовка */
@@ -1580,8 +1604,6 @@ p.chapterResult {
 
 p.HeadResult + p.chapterResult {
     padding-top: var(--chapter-result-padding-top) !important;
-
-    font-weight: 700 !important;
 }
 
 
