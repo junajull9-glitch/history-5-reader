@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <title>История нашего края — электронный учебник</title>
   <link rel="stylesheet" href="fonts/fonts.css">
-  <link rel="stylesheet" href="app/styles/reader.css?v=right-panels-independent-2">
+  <link rel="stylesheet" href="app/styles/reader.css?v=arrows-variant4-20261022">
 
 <style id="desktop-toc-compact-layout-fix">
     @media (min-width: 821px) and (max-width: 1100px) {
@@ -99,7 +99,7 @@
 
     <section class="reader-stage">
       <button class="page-arrow left" id="prevBtn" aria-label="Назад">‹</button>
-      <div class="book-frame"><iframe id="bookFrame" title="Учебник" src="book/NN-history-5.html?v=single-page-light-4"></iframe></div>
+      <div id="servicePageLayer" hidden aria-label="Служебная страница"></div><div class="book-frame"><iframe id="bookFrame" title="Учебник" src="book/NN-history-5.html?v=single-page-light-4"></iframe></div>
       <button class="page-arrow right" id="nextBtn" aria-label="Вперёд">›</button>
     </section>
 
@@ -168,10 +168,13 @@
   <iframe id="interactiveModuleFrame" class="interactive-module-frame" title="Интерактивный учебный модуль" loading="eager"></iframe>
 </div>
 
+<dialog id="serviceMapDialog" aria-label="Увеличенная карта"><div class="service-map-toolbar"><strong>Интерактивная карта</strong><button id="serviceMapClose" class="service-close" aria-label="Закрыть карту">×</button></div><div class="service-map-body"><div class="service-map-viewport" id="serviceMapViewport"><div class="service-map-inner"><img id="serviceMapImage" alt="Карта" draggable="false"></div></div><aside id="serviceMapLegend" class="service-map-legend" hidden><img src="service-pages/legend.png" alt="Условные обозначения карты"></aside></div><div class="service-map-footer"><p id="serviceMapCaption" class="service-caption"></p><div class="service-controls"><button id="serviceMapMinus" aria-label="Уменьшить">−</button><button id="serviceMapReset" aria-label="Сбросить масштаб">100%</button><button id="serviceMapPlus" aria-label="Увеличить">＋</button></div></div></dialog>
 <dialog id="noteDialog"><form method="dialog"><h3>Заметка</h3><p id="noteSelectionHint" class="note-selection-hint"></p><div class="note-color-row"><span>Цвет выделения</span><button class="note-color selected" data-color="#ffe58a" style="--swatch:#ffe58a" title="Жёлтый"></button><button class="note-color" data-color="#bfe7b5" style="--swatch:#bfe7b5" title="Зелёный"></button><button class="note-color" data-color="#b9dcff" style="--swatch:#b9dcff" title="Голубой"></button><button class="note-color" data-color="#f6bfd8" style="--swatch:#f6bfd8" title="Розовый"></button></div><textarea id="noteText" rows="7" placeholder="Введите текст заметки…"></textarea><div class="dialog-actions"><button value="cancel">Отмена</button><button id="saveNote" value="default">Сохранить</button></div></form></dialog>
 <script src="config/reader-config.js"></script>
 <script src="app/services/storage.js"></script>
 <script src="app/bookmarks.js?v=mobile-notes-step4"></script>
-<script src="app/reader.js?v=right-panels-independent-2"></script>
+<link rel="stylesheet" href="service-pages/service-pages.css">
+<script src="service-pages/service-pages.js"></script>
+<script src="app/reader.js?v=toc-start-only-20261022"></script>
 </body>
 </html>

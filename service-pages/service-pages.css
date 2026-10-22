@@ -1,0 +1,86 @@
+
+/* Independent service pages: excluded from InDesign book export. */
+#servicePageLayer{position:absolute;inset:0;z-index:8;display:flex;align-items:center;justify-content:center;background:#dcd1bf;overflow:auto;padding:10px;box-sizing:border-box}
+#servicePageLayer[hidden]{display:none!important}
+.service-sheet{position:relative;background:#fff;box-shadow:0 3px 14px #0002;max-width:100%;max-height:100%;overflow:hidden}
+.service-cover{height:100%;aspect-ratio:1494/2048}
+.service-cover img{width:100%;height:100%;object-fit:contain;display:block}
+.service-endpaper{width:min(100%,1250px);aspect-ratio:1.48;display:grid;grid-template-columns:minmax(0,4.6fr) minmax(140px,1fr);grid-template-rows:1fr;gap:8px;padding:14px;box-sizing:border-box;background:#f8f5eb}
+.service-maps{position:relative;min-height:0}
+.service-main-map{width:100%;height:100%;object-fit:contain}
+.service-inset{position:absolute;left:0;bottom:0;width:32%;max-height:40%;object-fit:contain;background:white;border:1px solid #aaa}
+.service-legend{width:100%;height:100%;object-fit:contain;background:white}
+.service-map-click{cursor:zoom-in}
+.service-map-click:focus-visible{outline:3px solid #0099ce}
+.service-map-caption{position:absolute;bottom:8px;right:8px;background:#fffdebdc;padding:3px 8px;font:12px Arial,sans-serif}
+#serviceMapDialog{border:0;border-radius:8px;padding:40px 12px 12px;background:#f8f5eb;box-shadow:0 12px 55px #0007;max-width:96vw;max-height:94vh;box-sizing:border-box}
+#serviceMapDialog::backdrop{background:#000b}
+#serviceMapDialog img{display:block;max-width:90vw;max-height:75vh;object-fit:contain;transform-origin:center;cursor:zoom-in}
+#serviceMapDialog .service-caption{text-align:center;margin:8px 0;font:15px Arial,sans-serif}
+#serviceMapDialog .service-controls{display:flex;gap:12px;justify-content:center;align-items:center}
+#serviceMapDialog button{font:16px Arial,sans-serif;padding:5px 12px;cursor:pointer}
+#serviceMapDialog .service-close{position:absolute;right:8px;top:5px}
+@media(max-width:650px){#servicePageLayer{padding:5px}.service-endpaper{padding:6px;gap:3px;grid-template-columns:minmax(0,4fr) minmax(60px,1fr)}.service-map-caption{font-size:9px}}
+
+/* Full-bleed cover: remove beige margins on the cover only. */
+#servicePageLayer:has(.service-cover){padding:0;background:#dcd1bf;overflow:hidden}
+#servicePageLayer .service-cover{width:auto;height:100%;max-width:100%;max-height:100%;aspect-ratio:1494/2048;box-shadow:none}
+#servicePageLayer .service-cover img{width:100%;height:100%;object-fit:fill}
+
+/* Desktop map viewer: viewport-sized modal with controls outside scrollable image. */
+#serviceMapDialog{position:fixed;inset:0;margin:auto;width:min(96vw,1500px);height:min(94vh,1000px);max-width:none;max-height:none;padding:0;overflow:hidden;flex-direction:column;background:#f8f5eb}
+#serviceMapDialog[open]{display:flex}
+#serviceMapDialog .service-map-toolbar{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:#f8f5eb;border-bottom:1px solid #d7c9af;z-index:2}
+#serviceMapDialog .service-close{position:static;flex:0 0 auto;font-size:24px;line-height:1;min-width:42px;min-height:40px}
+#serviceMapDialog .service-map-viewport{flex:1 1 auto;min-height:0;min-width:0;overflow:auto;display:flex;align-items:safe center;justify-content:safe center;overscroll-behavior:contain;background:#e5dfd2}
+#serviceMapDialog .service-map-inner{flex:none;display:block;max-width:none;max-height:none}
+#serviceMapDialog img{display:block;width:auto;height:auto;max-width:none;max-height:none;object-fit:contain;transform:none!important;cursor:grab}
+#serviceMapDialog .service-map-footer{flex:0 0 auto;padding:8px 14px 12px;background:#f8f5eb;border-top:1px solid #d7c9af;z-index:2}
+#serviceMapDialog .service-caption{margin:0 0 8px}
+#serviceMapDialog .service-controls{gap:10px}
+#serviceMapDialog .service-controls button{min-width:42px;min-height:36px}
+@media(max-width:650px){#serviceMapDialog{width:100vw;height:100dvh;max-height:100dvh;border-radius:0}#serviceMapDialog .service-map-toolbar{padding:6px 10px}}
+
+/* Fixed legend beside the large map; independent panning area. */
+#serviceMapDialog .service-map-body{display:flex;flex:1 1 auto;min-height:0;min-width:0;overflow:hidden}
+#serviceMapDialog .service-map-body .service-map-viewport{flex:1 1 auto;min-width:0;cursor:grab;touch-action:none}
+#serviceMapDialog .service-map-body .service-map-viewport.dragging{cursor:grabbing}
+#serviceMapDialog .service-map-body .service-map-viewport.dragging img{cursor:grabbing}
+#serviceMapDialog .service-map-legend{flex:0 0 clamp(170px,19vw,290px);min-width:0;overflow:auto;background:#fff;border-left:1px solid #d7c9af;padding:8px;box-sizing:border-box}
+#serviceMapDialog .service-map-legend[hidden]{display:none!important}
+#serviceMapDialog .service-map-legend img{width:100%;height:auto;max-width:100%;max-height:none;cursor:default;user-select:none}
+#serviceMapDialog #serviceMapImage{user-select:none;-webkit-user-drag:none}
+@media(max-width:650px){#serviceMapDialog .service-map-body{flex-direction:column}#serviceMapDialog .service-map-legend{flex:0 0 24%;border-left:0;border-top:1px solid #d7c9af}#serviceMapDialog .service-map-legend img{width:auto;max-width:100%;height:auto;margin:auto}}
+
+/* Map labels stay separate from image assets and do not intercept clicks. */
+.service-map-title{position:absolute;z-index:2;pointer-events:none;text-align:center;color:#b85b36;font:bold clamp(10px,1.1vw,17px)/1.15 Arial,sans-serif;text-shadow:0 1px 1px #fff;background:rgba(248,245,235,.92);padding:4px 8px;box-sizing:border-box}
+.service-map-title-main{top:0;left:0;right:0}
+.service-map-title-inset{left:0;bottom:40%;width:32%;font-size:clamp(8px,.75vw,12px);padding:3px 4px}
+@media(max-width:650px){.service-map-title-main{font-size:10px}.service-map-title-inset{font-size:7px}}
+
+/* Captions belong to their own map, never overlay the other map. */
+.service-endpaper .service-maps{display:flex;flex-direction:column;gap:7px;overflow:hidden}
+.service-endpaper .service-primary{display:flex;flex-direction:column;flex:1 1 0;min-height:0;align-items:center}
+.service-endpaper .service-map-title-main{position:static;display:block;flex:0 0 auto;width:100%;font-size:clamp(11px,1.1vw,17px);padding:2px 4px 7px;background:transparent}
+.service-endpaper .service-main-map{display:block;flex:1 1 0;min-height:0;max-width:100%;width:100%;height:100%;object-fit:contain}
+.service-endpaper .service-inset-figure{position:relative;flex:0 0 29%;min-height:0;max-width:38%;width:38%;margin:0;display:flex;flex-direction:column;align-items:stretch;gap:3px}
+.service-endpaper .service-inset{position:static;display:block;width:100%;height:calc(100% - 32px);max-height:none;min-height:0;object-fit:contain;box-sizing:border-box}
+.service-endpaper .service-inset-label{flex:0 0 auto;text-align:center;color:#b85b36;font:bold clamp(9px,.8vw,12px)/1.2 Arial,sans-serif;background:#f8f5eb;padding:2px;overflow-wrap:anywhere}
+.service-endpaper .service-map-caption{right:4px;bottom:4px;font-size:10px}
+@media(max-width:650px){.service-endpaper .service-inset-figure{flex-basis:32%;max-width:48%;width:48%}.service-endpaper .service-inset-label{font-size:8px}.service-endpaper .service-inset{height:calc(100% - 36px)}}
+
+/* Reference layout: full-size main map, inset anchored bottom-left, caption BELOW inset. */
+.service-endpaper .service-maps{position:relative;display:block;overflow:hidden;min-height:0}
+.service-endpaper .service-primary{position:absolute;inset:0;display:flex;flex-direction:column;align-items:stretch;min-height:0}
+.service-endpaper .service-map-title-main{position:relative;flex:none;display:block;text-align:center;padding:2px 4px 6px;line-height:1.2;background:transparent}
+.service-endpaper .service-main-map{display:block;flex:1 1 auto;min-height:0;width:100%;height:100%;max-width:100%;object-fit:contain;object-position:center top}
+.service-endpaper .service-inset-figure{position:absolute;left:0;bottom:0;width:38%;max-width:38%;height:auto;max-height:45%;margin:0;display:flex;flex-direction:column;gap:0;z-index:3;min-height:0;background:#f8f5eb}
+.service-endpaper .service-inset{position:relative;flex:0 1 auto;display:block;width:100%;height:auto;max-height:calc(100% - 40px);min-height:0;object-fit:contain;box-sizing:border-box;border:1px solid #aaa}
+.service-endpaper .service-inset-label{position:relative;flex:0 0 auto;display:block;padding:5px 4px;text-align:center;background:#f8f5eb;line-height:1.15;min-height:0}
+.service-endpaper .service-inset-label .service-map-title-inset{position:static;display:block;width:100%;background:transparent;padding:0;font:bold clamp(9px,.85vw,13px)/1.15 Arial,sans-serif;color:#b85b36;pointer-events:none}
+.service-endpaper .service-map-caption{position:absolute;bottom:3px;right:3px;z-index:2}
+@media(max-width:650px){.service-endpaper .service-inset-figure{width:43%;max-width:43%;max-height:48%}.service-endpaper .service-inset-label .service-map-title-inset{font-size:8px}}
+
+/* Move inset to free lower-right area on both endpapers. */
+.service-endpaper .service-inset-figure{left:auto;right:0;bottom:0}
+.service-endpaper .service-map-caption{right:auto;left:4px}

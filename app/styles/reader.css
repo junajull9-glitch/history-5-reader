@@ -1293,3 +1293,30 @@ body { position: relative; }
     pointer-events: none !important;
   }
 }
+
+
+/* Desktop page navigation: customer-approved variant 4 (minimal beige chevrons).
+   Keep existing sheet-relative positioning and mobile appearance unchanged. */
+@media (min-width:821px){
+  .reader-stage .page-arrow{
+    background:transparent!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    color:#c8ab73!important;
+    font-family:Arial,sans-serif!important;
+    font-weight:300!important;
+    font-size:46px!important;
+    width:40px!important;
+    height:64px!important;
+    opacity:1!important;
+    transition:color .15s ease,opacity .15s ease!important;
+  }
+  .reader-stage .page-arrow:hover{
+    background:transparent!important;
+    color:#a88a53!important;
+  }
+  .reader-stage .page-arrow:active{color:#806638!important;}
+}

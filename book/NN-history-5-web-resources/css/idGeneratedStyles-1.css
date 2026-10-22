@@ -21,6 +21,9 @@ div.OBJ_Figure_Left2 {
 div.OBJ_Figure_Right2 {
 	border-style:solid;
 }
+div.OBJ_Illustration-left {
+	border-style:solid;
+}
 div.OBJ_KeyTerms {
 	border-style:solid;
 }
@@ -216,7 +219,7 @@ td.tableBlue {
 }
 p.Attention {
 	color:#000000;
-	font-family:"Times New Roman (OTF) Regular", sans-serif;
+	font-family:"Times New Roman", serif;
 	font-size:12px;
 	font-style:normal;
 	font-variant:normal;
@@ -394,7 +397,7 @@ p.Inset {
 }
 p.List {
 	color:#000000;
-	font-family:"Times New Roman (OTF) Regular", sans-serif;
+	font-family:"Times New Roman", serif;
 	font-size:13px;
 	font-style:normal;
 	font-variant:normal;
@@ -666,9 +669,9 @@ p.documentHead {
 }
 p.friend {
 	color:#009fe3;
-	font-family:"Times New Roman (OTF) Italic", sans-serif;
+	font-family:"Times New Roman", serif;
 	font-size:14px;
-	font-style:normal;
+	font-style:italic;
 	font-variant:normal;
 	font-weight:normal;
 	line-height:1.071;
@@ -685,30 +688,9 @@ p.friend {
 	text-transform:none;
 	widows:1;
 }
-p.heading-3-item {
-	color:#4c94d8;
-	font-family:"Akrobat Bold", sans-serif;
-	font-size:19px;
-	font-style:normal;
-	font-variant:normal;
-	font-weight:bold;
-	line-height:1.2;
-	margin-bottom:17px;
-	margin-left:0;
-	margin-right:0;
-	margin-top:0;
-	orphans:99;
-	page-break-after:avoid;
-	page-break-before:auto;
-	text-align:center;
-	text-decoration:none;
-	text-indent:0;
-	text-transform:none;
-	widows:1;
-}
 p.introduction {
 	color:#000000;
-	font-family:"Times New Roman (OTF) Regular", sans-serif;
+	font-family:"Times New Roman", serif;
 	font-size:10px;
 	font-style:normal;
 	font-variant:normal;
@@ -773,9 +755,9 @@ p.key {
 }
 p.link {
 	color:#000000;
-	font-family:"Times New Roman (OTF) Italic", sans-serif;
+	font-family:"Times New Roman", serif;
 	font-size:12px;
-	font-style:normal;
+	font-style:italic;
 	font-variant:normal;
 	font-weight:normal;
 	line-height:1;
@@ -816,7 +798,7 @@ p.link2 {
 }
 p.main {
 	color:#000000;
-	font-family:"Times New Roman (OTF) Regular", sans-serif;
+	font-family:"Times New Roman", serif;
 	font-size:13px;
 	font-style:normal;
 	font-variant:normal;
@@ -914,7 +896,7 @@ p.term_word {
 	border-style:dotted;
 	border-width:2px 2px 2px 2px;
 	color:#000000;
-	font-family:"Times New Roman (OTF) Regular", sans-serif;
+	font-family:"Times New Roman", serif;
 	font-size:12px;
 	font-style:normal;
 	font-variant:normal;
@@ -936,11 +918,11 @@ p.term_word {
 }
 p.шапка-табл {
 	color:#000000;
-	font-family:"Times New Roman (OTF) Bold", sans-serif;
+	font-family:"Times New Roman", serif;
 	font-size:11px;
 	font-style:normal;
 	font-variant:normal;
-	font-weight:normal;
+	font-weight:bold;
 	line-height:1.048;
 	margin-bottom:0;
 	margin-left:0;
@@ -1512,13 +1494,13 @@ span.CharOverride-3 {
 	font-weight:bold;
 }
 span.CharOverride-4 {
+	font-variant:normal;
+	text-transform:uppercase;
+}
+span.CharOverride-5 {
 	font-size:15px;
 	font-style:italic;
 	font-weight:bold;
-}
-span.CharOverride-5 {
-	font-variant:normal;
-	text-transform:uppercase;
 }
 span.CharOverride-6 {
 	font-family:Arial, sans-serif;
@@ -1627,7 +1609,7 @@ span.CharOverride-29 {
 	font-weight:normal;
 }
 span.CharOverride-30 {
-	font-family:"Times New Roman (OTF) Regular", sans-serif;
+	font-family:"Times New Roman", serif;
 	font-style:normal;
 	font-weight:normal;
 }
@@ -1642,17 +1624,17 @@ span.CharOverride-32 {
 }
 span.CharOverride-33 {
 	color:#009fe3;
-	font-family:"Times New Roman (OTF) Regular", sans-serif;
+	font-family:"Times New Roman", serif;
 	font-style:normal;
 	font-weight:normal;
 }
 span.CharOverride-34 {
-	font-family:"Times New Roman (OTF) Bold", sans-serif;
+	font-family:"Times New Roman", serif;
 	font-style:normal;
-	font-weight:normal;
+	font-weight:bold;
 }
 span.CharOverride-35 {
-	font-family:"Times New Roman (OTF) Regular", sans-serif;
+	font-family:"Times New Roman", serif;
 	font-size:13px;
 	font-style:normal;
 	font-weight:normal;
@@ -3506,7 +3488,7 @@ table._idGenTablePara-4 {
 	position:relative;
 	width:59.07%;
 }
-#_idContainer333, #_idContainer568, #_idContainer569, #_idContainer570, #_idContainer571, #_idContainer572, #_idContainer573, #_idContainer574, #_idContainer575, #_idContainer577 {
+#_idContainer333, #_idContainer568, #_idContainer569, #_idContainer570, #_idContainer571, #_idContainer572, #_idContainer573, #_idContainer574, #_idContainer576 {
 	display:inline-block;
 	height:38px;
 	width:38px;
@@ -4588,16 +4570,16 @@ table._idGenTablePara-4 {
 	position:relative;
 	width:95.35%;
 }
-#_idContainer564, #_idContainer565, #_idContainer566, #_idContainer567, #_idContainer576 {
+#_idContainer564, #_idContainer565, #_idContainer566, #_idContainer567, #_idContainer575 {
 	display:inline-block;
 }
-#_idContainer579, #_idContainer580, #_idContainer582 {
+#_idContainer578, #_idContainer579, #_idContainer581 {
 	display:inline-block;
 	height:0px;
 	position:relative;
 	width:0px;
 }
-#_idContainer581 {
+#_idContainer580 {
 	display:inline-block;
 	height:6px;
 	position:relative;

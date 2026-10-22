@@ -35,7 +35,8 @@ const INTERACTIVE_MODULES = Object.freeze({
   p66_1: 'modules/interactive_map_004/index.html',
   p68_1: 'modules/interactive_map_005/index.html',
   p79_1: 'modules/interactive_map_006/index.html',
-  p118_1: 'modules/interactive_map_007/index.html'
+  p118_1: 'modules/interactive_map_007/index.html',
+  p125_1: 'modules/interactive_map_008/index.html'
 });
 
 function getImageFileKey(src) {
@@ -409,6 +410,8 @@ function applyInterfaceScale(scale) {
 applyInterfaceScale(1);
 let notes = load('notes', []);
 let currentState = load('position', { page: '1', pageIndex: 0 });
+window.__serviceLastBookPage = currentState.page || '1';
+window.__serviceLastBookIndex = currentState.pageIndex || 0;
 let searchTimer;
 let editingNote = null;
 let pendingSelection = null;
@@ -433,7 +436,9 @@ addEventListener('message', event => {
 
   if (message.type === 'state') {
     currentState = message.payload || currentState;
-    $('#pageInput').value = currentState.page || '1';
+    window.__serviceLastBookPage = currentState.page || '1';
+    window.__serviceLastBookIndex = currentState.pageIndex;
+    if (!window.ReaderServicePages?.isActive()) $('#pageInput').value = currentState.page || '1';
     save('position', currentState);
     requestAnimationFrame(() => requestAnimationFrame(syncDesktopPageArrowPosition));
   }
@@ -489,6 +494,14 @@ function buildToc(items) {
   const list = $('#tocList');
   list.innerHTML = '';
 
+  const serviceLinks=[[-2,'Передняя обложка','Обложка'],[-1,'Передний форзац','Форзац']];
+  const addService=(id,title,label)=>{
+    const button=document.createElement('button');button.type='button';button.className='toc-item level-0 service-toc-item';
+    const name=document.createElement('span');name.className='toc-item-title';name.textContent=title;
+    const pages=document.createElement('span');pages.className='toc-item-pages';pages.textContent=label;
+    button.append(name,pages);button.addEventListener('click',()=>{window.ReaderServicePages?.show(id);if(isMobileReader())window.closeMobileDrawers?.();});list.appendChild(button);
+  };
+  serviceLinks.forEach(row=>addService(...row));
   items.forEach(item => {
     const button = document.createElement('button');
     button.type = 'button';
@@ -505,20 +518,14 @@ function buildToc(items) {
       1,
       Number(item.pageStart) || (Number(item.pageIndex) + 1) || 1
     );
-    const pageEnd = Math.max(
-      pageStart,
-      Number(item.pageEnd) || pageStart
-    );
-
-    pages.textContent = pageStart === pageEnd
-      ? `стр. ${pageStart}`
-      : `стр. ${pageStart}–${pageEnd}`;
+    pages.textContent = `стр. ${pageStart}`;
 
     button.append(title, pages);
 
     button.addEventListener('click', event => {
       event.preventDefault();
       event.stopPropagation();
+      window.ReaderServicePages?.hide();
       send('gotoToc', {
         target: item.target,
         pageIndex: Number(item.pageIndex),
@@ -529,24 +536,34 @@ function buildToc(items) {
     list.appendChild(button);
   });
 
-  if (!items.length) {
+  addService(-3,'Задний форзац (эрзац)','Эрзац');
+  addService(-4,'Задняя обложка','Обложка');
+  if (!items.length && !list.children.length) {
     list.innerHTML = '<p style="padding:12px">В книге не найдены абзацы со стилями <code>Chapter1</code> и <code>Paragraph</code>.</p>';
   }
 }
 
+window.addEventListener('reader-service-open-first-page', () => send('gotoPage', { page: '1' }));
+
 function turn(delta) {
+  if (window.ReaderServicePages?.nav(delta)) return;
   send('page', { delta });
 }
 
 
 $('#prevBtn').onclick = $('#bottomPrev').onclick = () => turn(-1);
 $('#nextBtn').onclick = $('#bottomNext').onclick = () => turn(1);
-$('#homeBtn').onclick = () => send('home');
+$('#homeBtn').onclick = () => { window.ReaderServicePages?.show(-2); };
 
 function submitPageNumber() {
   const input = $('#pageInput');
   const value = String(input?.value || '').trim();
   if (!value) return;
+  if (/^(обложка|cover|0)$/i.test(value)) { window.ReaderServicePages?.show(-2); input?.blur(); return; }
+  if (/^(эрзац|-3)$/i.test(value)) { window.ReaderServicePages?.show(-3); input?.blur(); return; }
+  if (/^(задняя обложка|-4)$/i.test(value)) { window.ReaderServicePages?.show(-4); input?.blur(); return; }
+  if (/^(форзац|endpaper|-1)$/i.test(value)) { window.ReaderServicePages?.show(-1); input?.blur(); return; }
+  window.ReaderServicePages?.hide();
   send('gotoPage', { page: value });
   input?.blur();
 }
